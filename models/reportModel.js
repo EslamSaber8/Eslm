@@ -29,7 +29,7 @@ const reportSchema = new mongoose.Schema({
   toObject: { virtuals: true },
 });
 
-reportSchema.virtual('Offer', {
+reportSchema.virtual('Offers', {
   ref: 'Offer',
   foreignField: 'report',
   localField: '_id',
