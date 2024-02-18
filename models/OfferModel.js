@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-// Define schema for the entire dataasdas
+// Define schema for the entire data
 const OfferSchema = new mongoose.Schema({
     price: Number,
     deadline: Date,
