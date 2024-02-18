@@ -20,7 +20,6 @@ exports.createReportValidator = [
     // Validate locationOfVehicle field
     body('locationOfVehicle').isString().notEmpty().withMessage('Location of vehicle is required'),
     // Validate selectInsuranceCompany field
-    body('insurance').isString().notEmpty().withMessage('Insurance company selection is required'),
     validatorMiddleware,
 ];
 exports.updateReportValidator = [
@@ -37,7 +36,6 @@ exports.updateReportValidator = [
     // Validate locationOfVehicle field if present
     body('locationOfVehicle').optional().isString().withMessage('Location of vehicle must be a string'),
     // Validate selectInsuranceCompany field if present
-    body('insurance').optional().isString().withMessage('Insurance company must be a string'),
     validatorMiddleware,
 ];
 exports.deleteReportValidator = [

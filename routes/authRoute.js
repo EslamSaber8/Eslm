@@ -10,14 +10,23 @@ const {
   forgotPassword,
   verifyPassResetCode,
   resetPassword,
+  allowedTo,
+  signupAs,
+  protect
 } = require('../services/authService');
 
 const router = express.Router();
-
-router.post('/signup', signupValidator, signup);
+//  /workshop
+router.post('/signup/:role', signupValidator, signupAs);
 router.post('/login',loginValidator,login);
 router.post('/forgotPassword', forgotPassword);
 router.post('/verifyResetCode', verifyPassResetCode);
 router.put('/resetPassword', resetPassword);
+
+
+router.use(protect); 
+
+router.post('/signup',allowedTo('superAdmin'), signupValidator, signup);
+
 
 module.exports = router;

@@ -1,6 +1,4 @@
 const asyncHandler = require('express-async-handler');
-const { v4: uuidv4 } = require('uuid');
-const sharp = require('sharp');
 const bcrypt = require('bcryptjs');
 
 const factory = require('./handlersFactory');
@@ -13,22 +11,22 @@ const User = require('../models/userModel');
 exports.uploadUserImage = uploadSingleImage('license');
 
 // Image processing
-exports.resizeImage = asyncHandler(async (req, res, next) => {
-  const filename = `user-${uuidv4()}-${Date.now()}.jpeg`;
+// exports.resizeImage = asyncHandler(async (req, res, next) => {
+//   const filename = `user-${uuidv4()}-${Date.now()}.jpeg`;
 
-  if (req.file) {
-    await sharp(req.file.buffer)
-      .resize(600, 600)
-      .toFormat('jpeg')
-      .jpeg({ quality: 95 })
-      .toFile(`uploads/users/${filename}`);
+//   if (req.file) {
+//     await sharp(req.file.buffer)
+//       .resize(600, 600)
+//       .toFormat('jpeg')
+//       .jpeg({ quality: 95 })
+//       .toFile(`uploads/users/${filename}`);
 
-    // Save image into our db
-    req.body.license = filename;
-  }
+//     // Save image into our db
+//     req.body.license = filename;
+//   }
 
-  next();
-});
+//   next();
+// });
 
 // @desc    Get list of users
 // @route   GET /api/v1/users

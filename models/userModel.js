@@ -22,7 +22,11 @@ const userSchema = new mongoose.Schema(
     license: {
         type: String,
       },
-
+    accountState: {
+      type: String,
+      enum: ['underReview', "approved", "rejected"],
+      default: 'underReview',
+    },
     password: {
       type: String,
       required: [true, 'password required'],

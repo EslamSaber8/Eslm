@@ -15,7 +15,6 @@ const {
   updateUser,
   deleteUser,
   uploadUserImage,
-  resizeImage,
   changeUserPassword,
   changeUserRole ,
   getLoggedUserData,
@@ -45,11 +44,11 @@ router.put(
 router
   .route('/')
   .get(getUsers)
-  .post(uploadUserImage, resizeImage, createUserValidator, createUser);
+  .post(uploadUserImage,  createUserValidator, createUser);
 router
   .route('/:id')
   .get(getUserValidator, getUser)
-  .put(uploadUserImage, resizeImage, updateUserValidator, updateUser)
+  .put(uploadUserImage,  updateUserValidator, updateUser)
   .delete(deleteUserValidator, deleteUser);
 
   router.use(authService.allowedTo('superAdmin'));
