@@ -19,7 +19,7 @@ exports.createOfferValidator = [
         .withMessage("Invalid report id format")
         .custom((val, { req }) =>
             // Check if logged user create offer before
-            Offer.findOne({ user: req.user._id, report: req.body.report }).then((offer) => {
+            Offer.findOne({ createdBy: req.user._id, report: req.body.report }).then((offer) => {
                 console.log(offer)
                 if (offer) {
                     return Promise.reject(new Error("You already created a offer before"))
