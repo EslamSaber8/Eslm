@@ -16,7 +16,7 @@ const OfferSchema = new mongoose.Schema({
     },
 })
 OfferSchema.pre(/^find/, function (next) {
-    this.populate({ path: "user", select: "name role" })
+    this.populate({ path: "createdBy", select: "name role" })
     next()
 })
 OfferSchema.pre(/^find/, function (next) {
