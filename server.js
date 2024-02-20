@@ -3,7 +3,7 @@ const path = require("path")
 const express = require("express")
 const dotenv = require("dotenv")
 const morgan = require("morgan")
-
+const cors = require('cors');
 dotenv.config({ path: "config.env" })
 const ApiError = require("./utils/apiError")
 const globalError = require("./middlewares/errorMiddleware")
@@ -19,6 +19,9 @@ dbConnection()
 
 // express app
 const app = express()
+// Enable other domains to access your application
+app.use(cors());
+app.options('*', cors());
 
 // Middlewares
 app.use(express.json())
