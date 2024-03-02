@@ -54,6 +54,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
       phone: req.body.phone,
       email: req.body.email,
       license: req.body.license,
+      idImg:req.body.idImg
     },
     {
       new: true,
@@ -169,7 +170,8 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
       name: req.body.name,
       email: req.body.email,
       phone: req.body.phone,
-      license:req.body.license
+      license:req.body.license,
+      idImg:req.body.idImg
     },
     { new: true }
   );

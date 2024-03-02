@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema(
     license: {
         type: String,
       },
+    idImg:String,
     accountState: {
       type: String,
       enum: ['underReview', "approved", "rejected"],
