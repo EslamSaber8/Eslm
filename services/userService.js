@@ -97,16 +97,6 @@ exports.changeUserRole = asyncHandler(async (req, res, next) => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
 exports.changeUserPassword = asyncHandler(async (req, res, next) => {
   const document = await User.findByIdAndUpdate(
     req.params.id,

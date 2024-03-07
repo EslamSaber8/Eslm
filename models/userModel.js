@@ -23,6 +23,12 @@ const userSchema = new mongoose.Schema(
         type: String,
       },
     idImg:String,
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+    verifyCode: String,
+    verificationExpires: Date
     accountState: {
       type: String,
       enum: ['underReview', "approved", "rejected"],
@@ -51,12 +57,17 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+
+
+
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   // Hashing user password
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
+
+
 
 const User = mongoose.model('User', userSchema);
 
