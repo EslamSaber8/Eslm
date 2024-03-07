@@ -43,6 +43,9 @@ exports.createUserValidator = [
   check('license')  
   .notEmpty()
   .withMessage('license required'),
+  check('idImg')  
+  .notEmpty()
+  .withMessage(' idImg required'),
   check('role').optional(),
 
   validatorMiddleware,
@@ -74,10 +77,10 @@ exports.updateUserValidator = [
     ),
   check('phone')
     .optional()
-    .isMobilePhone(['ar-EG', 'ar-SA'])
-    .withMessage('Invalid phone number only accepted Egy and SA Phone numbers'),
+    .isMobilePhone(['ar-SA'])
+    .withMessage('Invalid phone number only accepted SA Phone numbers'),
 
-  check('profileImg').optional(),
+  check('idImg').optional(),
   check('role').optional(),
   validatorMiddleware,
 ];
@@ -142,8 +145,8 @@ exports.updateLoggedUserValidator = [
     ),
   check('phone')
     .optional()
-    .isMobilePhone(['ar-EG', 'ar-SA'])
-    .withMessage('Invalid phone number only accepted Egy and SA Phone numbers'),
+    .isMobilePhone(['ar-SA'])
+    .withMessage('Invalid phone number only accepted Saudi Arabia Phone numbers'),
 
   validatorMiddleware,
 ];

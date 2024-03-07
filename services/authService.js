@@ -9,28 +9,38 @@ const sendEmail = require("../utils/sendEmail")
 const createToken = require("../utils/createToken")
 
 const User = require("../models/userModel")
+const { sendSms } = require("../utils/sendSms")
 
 // @desc    Signup
 // @route   GET /api/v1/auth/signup
 // @access  Public
 exports.signupAs = asyncHandler(async (req, res, next) => {
     // 1- Create user
-    const allowedRoles = ["workshop","driver"]
+    const allowedRoles = ["workshop", "driver"]
     if (!allowedRoles.includes(req.params.role)) {
         return next(new ApiError(`You can't sign up as ${req.params.role}`, 400))
     }
+    const verifyCode = Math.floor(1000 + Math.random() * 9000).toString()
+    const verifyCodeExpires = Date.now() + 10 * 60 * 1000
+
     const user = await User.create({
         name: req.body.name,
         email: req.body.email,
         role: req.params.role,
+        verifyCode,
+        verifyCodeExpires,
         password: req.body.password,
         phone: req.body.phone,
         license: req.body.license,
     })
+
     // 2- Generate token
     const token = createToken(user._id)
 
-    res.status(201).json({ data: user, token })
+    // 3- Send verify code via sms
+    const smsResponse = await sendSms(user.phone, `Welcome to Eslm, your verify code is ${user.verifyCode} , it will expire in 10 minutes `, next)
+
+    return res.status(201).json({ data: user, token })
 })
 
 exports.signup = asyncHandler(async (req, res, next) => {
@@ -60,11 +70,6 @@ exports.login = asyncHandler(async (req, res, next) => {
 
     if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
         return next(new ApiError("Incorrect email or password", 401))
-    }
-    if (user.accountState == "underReview") {
-        return next(new ApiError("Your account is Under Review", 401))
-    } else if (user.accountState == "rejected") {
-        return next(new ApiError("Your account is rejected", 401))
     }
     // 3) generate token
     const token = createToken(user._id)
@@ -130,7 +135,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
         return next(new ApiError(`There is no user with that email ${req.body.email}`, 404))
     }
     // 2) If user exist, Generate hash reset random 6 digits and save it in db
-    const resetCode = Math.floor(100000 + Math.random() * 900000).toString()
+    const resetCode = Math.floor(1000 + Math.random() * 9000).toString()
     const hashedResetCode = crypto.createHash("sha256").update(resetCode).digest("hex")
 
     // Save hashed password reset code into db
@@ -142,23 +147,20 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     await user.save()
 
     // 3) Send the reset code via email
-    const message = `Hi ${user.name},\n We received a request to reset the password on your biuoteck Account. \n ${resetCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The biuoteck Team`
+
+    const message = `Hi ${user.name},\n We received a request to reset the password on your biuoteck Account. \n ${resetCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The Eslm Team`
     try {
-        await sendEmail({
-            email: user.email,
-            subject: "Your password reset code (valid for 10 min)",
-            message,
-        })
+        await sendSms(user.phone, message, next)
     } catch (err) {
         user.passwordResetCode = undefined
         user.passwordResetExpires = undefined
         user.passwordResetVerified = undefined
 
         await user.save()
-        return next(new ApiError("There is an error in sending email", 500))
+        return next(new ApiError("There is an error in sending the sms", 500))
     }
 
-    res.status(200).json({ status: "Success", message: "Reset code sent to email" })
+    res.status(200).json({ status: "Success", message: "Reset code sent to your Sms" })
 })
 
 // @desc    Verify password reset code
@@ -210,4 +212,63 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
     // 3) if everything is ok, generate token
     const token = createToken(user._id)
     res.status(200).json({ token })
+})
+
+exports.verifyEmail = asyncHandler(async (req, res, next) => {
+    // 1) Get user based on verify code
+    const userId = req.user
+
+    const user = await User.findById(userId._id)
+
+    if (user.verified) {
+        return next(new ApiError("Email already verified", 400))
+    }
+    if (user.verifyCode !== req.body.verifyCode) {
+        return next(new ApiError("Verify code invalid or expired", 400))
+    }
+
+    if (user.verifyCodeExpires < Date.now()) {
+        return next(new ApiError("Verify code expired", 400))
+    }
+
+    // const userVerified = User.findByIdAndUpdate(user._id.toString(), { verified: true, verifyCode: undefined, verifyCodeExpires: undefined }, { new: true })
+
+    // 2) Verify code valid
+    user.verified = true
+    user.verifyCode = undefined
+    user.verifyCodeExpires = undefined
+
+    await user.save()
+
+    // console.log(userVerified);
+
+    res.status(200).json({
+        status: "Success",
+        message: "Email verified",
+        user,
+    })
+})
+
+exports.resendVerifyCode = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user._id)
+    if (!user) {
+        return next(new ApiError(`There is no user with email `, 404))
+    }
+    if (user.verified) {
+        return next(new ApiError("Email already verified", 400))
+    }
+    const verifyCode = Math.floor(1000 + Math.random() * 9000).toString()
+    const verifyCodeExpires = Date.now() + 10 * 60 * 1000
+
+    user.verifyCode = verifyCode
+    user.verifyCodeExpires = verifyCodeExpires
+
+    await user.save()
+    const smsResponse = await sendSms(user.phone, `Welcome to Eslm, your verify code is ${user.verifyCode} , it will expire in 10 minutes `, next)
+
+    res.status(200).json({
+        status: "Success",
+        message: "Verify code sent to email",
+        user,
+    })
 })
