@@ -34,6 +34,7 @@ exports.signupAs = asyncHandler(async (req, res, next) => {
         password: req.body.password,
         phone: req.body.phone,
         license: req.body.license,
+        idImg:req.body.idImg
     })
 
     // 2- Generate token
@@ -54,6 +55,8 @@ exports.signup = asyncHandler(async (req, res, next) => {
         accountState: "approved",
         password: req.body.password,
         phone: req.body.phone,
+        idImg:req.body.idImg
+
     })
 
     // 2- Generate token
@@ -73,6 +76,7 @@ exports.login = asyncHandler(async (req, res, next) => {
     if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
         return next(new ApiError("Incorrect email or password", 401))
     }
+
     // 3) generate token
     const token = createToken(user._id)
 
