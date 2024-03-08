@@ -25,7 +25,8 @@ app.options('*', cors());
 
 // Middlewares
 app.use(express.json())
-app.use(express.static(path.join(__dirname, "uploads")))
+// app.use(express.static(path.join(__dirname, "uploads")))
+app.use("/uploads", express.static("uploads"))
 
 if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"))

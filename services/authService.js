@@ -27,6 +27,8 @@ exports.signupAs = asyncHandler(async (req, res, next) => {
         name: req.body.name,
         email: req.body.email,
         role: req.params.role,
+        license: req.body.license,
+        idImg: req.body.idImg,
         verifyCode,
         verifyCodeExpires,
         password: req.body.password,
