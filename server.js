@@ -13,6 +13,11 @@ const reportRoute = require("./routes/reportRoute")
 const userRoute = require("./routes/userRoute")
 const authRoute = require("./routes/authRoute")
 const offerRoute = require("./routes/OfferRoute")
+const categoryRoute = require('./routes/categoryRoute');
+const brandRoute = require('./routes/brandRoute');
+const productRoute = require('./routes/productRoute');
+const reviewRoute = require('./routes/reviewRoute');
+
 
 // Connect with db
 dbConnection()
@@ -38,6 +43,11 @@ app.use("/api/v1/reports", reportRoute)
 app.use("/api/v1/users", userRoute)
 app.use("/api/v1/auth", authRoute)
 app.use("/api/v1/offer", offerRoute)
+
+app.use('/api/v1/categories', categoryRoute);
+app.use('/api/v1/brands', brandRoute);
+app.use('/api/v1/products', productRoute);
+app.use('/api/v1/reviews', reviewRoute);
 
 app.get("/", (req, res) => {
     res.send("Hello World")

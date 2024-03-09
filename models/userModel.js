@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     verifyCode: String,
-    verificationExpires: Date
+    verificationExpires: Date,
     accountState: {
       type: String,
       enum: ['underReview', "approved", "rejected"],
