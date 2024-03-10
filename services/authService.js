@@ -34,7 +34,7 @@ exports.signupAs = asyncHandler(async (req, res, next) => {
         password: req.body.password,
         phone: req.body.phone,
         license: req.body.license,
-        idImg:req.body.idImg
+        idImg: req.body.idImg,
     })
 
     // 2- Generate token
@@ -55,8 +55,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
         accountState: "approved",
         password: req.body.password,
         phone: req.body.phone,
-        idImg:req.body.idImg
-
+        idImg: req.body.idImg,
     })
 
     // 2- Generate token
@@ -217,7 +216,7 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
     // 3) if everything is ok, generate token
     const token = createToken(user._id)
-    res.status(200).json({ token })
+    res.status(200).json({ status: "Success", token })
 })
 
 exports.verifyEmail = asyncHandler(async (req, res, next) => {
