@@ -217,7 +217,7 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
     // 3) if everything is ok, generate token
     const token = createToken(user._id)
-    res.status(200).json({ token })
+    res.status(200).json({ status: "Success", token })
 })
 
 exports.verifyEmail = asyncHandler(async (req, res, next) => {
