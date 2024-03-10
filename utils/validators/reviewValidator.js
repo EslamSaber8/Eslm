@@ -9,10 +9,10 @@ exports.createReviewValidator = [
     .withMessage('ratings value required')
     .isFloat({ min: 1, max: 5 })
     .withMessage('Ratings value must be between 1 to 5'),
-  check('user').isMongoId().withMessage('Invalid Review id format'),
+  check('user').isMongoId().withMessage('Invalid user id format'),
   check('product')
     .isMongoId()
-    .withMessage('Invalid Review id format')
+    .withMessage('Invalid prodact id format')
     .custom((val, { req }) =>
       // Check if logged user create review before
       Review.findOne({ user: req.user._id, product: req.body.product }).then(
