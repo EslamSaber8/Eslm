@@ -3,21 +3,21 @@ const path = require("path")
 const express = require("express")
 const dotenv = require("dotenv")
 const morgan = require("morgan")
-const cors = require('cors');
+const cors = require("cors")
 dotenv.config({ path: "config.env" })
 const ApiError = require("./utils/apiError")
 const globalError = require("./middlewares/errorMiddleware")
 const dbConnection = require("./config/database")
+const i18n = require("i18n")
 // Routes
 const reportRoute = require("./routes/reportRoute")
 const userRoute = require("./routes/userRoute")
 const authRoute = require("./routes/authRoute")
 const offerRoute = require("./routes/OfferRoute")
-const categoryRoute = require('./routes/categoryRoute');
-const brandRoute = require('./routes/brandRoute');
-const productRoute = require('./routes/productRoute');
-const reviewRoute = require('./routes/reviewRoute');
-
+const categoryRoute = require("./routes/categoryRoute")
+const brandRoute = require("./routes/brandRoute")
+const productRoute = require("./routes/productRoute")
+const reviewRoute = require("./routes/reviewRoute")
 
 // Connect with db
 dbConnection()
@@ -25,8 +25,8 @@ dbConnection()
 // express app
 const app = express()
 // Enable other domains to access your application
-app.use(cors());
-app.options('*', cors());
+app.use(cors())
+app.options("*", cors())
 
 // Middlewares
 app.use(express.json())
@@ -37,6 +37,23 @@ if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"))
     console.log(`mode: ${process.env.NODE_ENV}`)
 }
+i18n.configure({
+    locales: ["ar", "en"],
+    directory: __dirname + "/locales", // if you don't specify this it will throw an error
+    queryParameter: "lang",
+    defaultLocales: ["en"], // if you don't specify this it will throw an error
+    cookie: "lang",
+})
+
+app.use(i18n.init)
+
+// Routes
+// app.use("/api/v1/auth", authRouter)
+app.use((req, res, next) => {
+    const userLang = req.query.lang || req.headers["accept-language"] || "en"
+    req.setLocale(userLang)
+    next()
+})
 
 // Mount Routes
 app.use("/api/v1/reports", reportRoute)
@@ -44,13 +61,13 @@ app.use("/api/v1/users", userRoute)
 app.use("/api/v1/auth", authRoute)
 app.use("/api/v1/offer", offerRoute)
 
-app.use('/api/v1/categories', categoryRoute);
-app.use('/api/v1/brands', brandRoute);
-app.use('/api/v1/products', productRoute);
-app.use('/api/v1/reviews', reviewRoute);
+app.use("/api/v1/categories", categoryRoute)
+app.use("/api/v1/brands", brandRoute)
+app.use("/api/v1/products", productRoute)
+app.use("/api/v1/reviews", reviewRoute)
 
 app.get("/", (req, res) => {
-    res.send("Hello World")
+    res.send(req.__("welcome"))
 })
 
 app.all("*", (req, res, next) => {

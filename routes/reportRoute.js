@@ -1,17 +1,18 @@
 const express = require("express")
 const router = express.Router()
 const authService = require("../services/authService")
-const { getReports, getReport, createReport, updateReport, deleteReport, uploadUserImage } = require("../services/reportService")
+const { getReports, getReport, createReport, updateReport, deleteReport } = require("../services/reportService")
 const { getReportValidator, createReportValidator, updateReportValidator, deleteReportValidator } = require("../utils/validators/reportValidator")
+const { uploadMultipleImages } = require("../utils/uploadImages")
 router.use(authService.protect)
 router.use(authService.allowedTo("admin", "superAdmin", "insurance"))
-router.route("/").get(authService.allowedTo("admin", "superAdmin"), getReports).post(uploadUserImage, createReportValidator, createReport)
+router.route("/").get(authService.allowedTo("admin", "superAdmin"), getReports).post(uploadMultipleImages, createReportValidator, createReport)
 
 //resizeImage,
 router
     .route("/:id")
     .get(getReportValidator, getReport)
-    .put(uploadUserImage, updateReportValidator, updateReport)
+    .put(uploadMultipleImages, updateReportValidator, updateReport)
     .delete(deleteReportValidator, deleteReport)
 
 module.exports = router
