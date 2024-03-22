@@ -11,7 +11,7 @@ exports.createOfferValidator = [
         .toDate()
 
         .notEmpty()
-        .withMessage("Date  is required"),
+        .withMessage("Date is required"),
     body("partPrice").isNumeric().optional(),
 
     check("report")
