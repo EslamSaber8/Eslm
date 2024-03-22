@@ -6,9 +6,9 @@ const User = require("../../models/userModel")
 exports.signupValidator = [
     check("name")
         .notEmpty()
-        .withMessage("User required")
+        .withMessage("userReq")
         .isLength({ min: 3 })
-        .withMessage("Too short User name")
+        .withMessage("userlength")
         .custom((val, { req }) => {
             req.body.slug = slugify(val)
             return true
@@ -16,32 +16,32 @@ exports.signupValidator = [
 
     check("email")
         .notEmpty()
-        .withMessage("Email required")
+        .withMessage("emailReq")
         .isEmail()
-        .withMessage("Invalid email address")
+        .withMessage("emailInvalid")
         .custom((val) =>
             User.findOne({ email: val }).then((user) => {
                 if (user) {
-                    return Promise.reject(new Error("E-mail already in user"))
+                    return Promise.reject(new Error("emailExists"))
                 }
             })
         ),
 
     check("password")
         .notEmpty()
-        .withMessage("Password required")
+        .withMessage("passReq")
         .isLength({ min: 6 })
-        .withMessage("Password must be at least 6 characters")
+        .withMessage("passlength")
         .custom((password, { req }) => {
             if (password !== req.body.passwordConfirm) {
-                throw new Error("Password Confirmation incorrect")
+                throw new Error("passMatch")
             }
             return true
         }),
 
-    check("passwordConfirm").notEmpty().withMessage("Password confirmation required"),
+    check("passwordConfirm").notEmpty().withMessage("passReqConf"),
 
-    check("license").notEmpty().withMessage("License required"),
+    check("license").notEmpty().withMessage("licenseReq"),
 
     check("idImg").notEmpty().withMessage("ID image required"),
 
@@ -49,9 +49,9 @@ exports.signupValidator = [
 ]
 
 exports.loginValidator = [
-    check("email").notEmpty().withMessage("Email required").isEmail().withMessage("Invalid email address"),
+    check("email").notEmpty().withMessage("emailReq").isEmail().withMessage("emailInvalid"),
 
-    check("password").notEmpty().withMessage("Password required").isLength({ min: 6 }).withMessage("Password must be at least 6 characters"),
+    check("password").notEmpty().withMessage("passReq").isLength({ min: 6 }).withMessage("passlength"),
 
     validatorMiddleware,
 ]

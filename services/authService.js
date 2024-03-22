@@ -16,9 +16,9 @@ const { sendSms } = require("../utils/sendSms")
 // @access  Public
 exports.signupAs = asyncHandler(async (req, res, next) => {
     // 1- Create user
-    const allowedRoles = ["workshop", "driver","vendor"]
+    const allowedRoles = ["workshop", "driver", "vendor"]
     if (!allowedRoles.includes(req.params.role)) {
-        return next(new ApiError(`You can't sign up as ${req.params.role}`, 400))
+        return next(new ApiError(`${req.__("signupAs")} ${req.params.role}`, 400))
     }
     const verifyCode = Math.floor(1000 + Math.random() * 9000).toString()
     const verifyCodeExpires = Date.now() + 10 * 60 * 1000
@@ -41,7 +41,7 @@ exports.signupAs = asyncHandler(async (req, res, next) => {
     const token = createToken(user._id)
 
     // 3- Send verify code via sms
-    const smsResponse = await sendSms(user.phone, `Welcome to Eslm, your verify code is ${user.verifyCode} , it will expire in 10 minutes `, next)
+    const smsResponse = await sendSms(user.phone, `${req.__("smsFirst")} ${user.verifyCode} ${req.__("smsLast")}`, next)
 
     return res.status(201).json({ data: user, token })
 })
@@ -73,7 +73,7 @@ exports.login = asyncHandler(async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email })
 
     if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
-        return next(new ApiError("Incorrect email or password", 401))
+        return next(new ApiError(req.__("incorrectEmailOrPass"), 401))
     }
 
     // 3) generate token
@@ -93,7 +93,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
         token = req.headers.authorization.split(" ")[1]
     }
     if (!token) {
-        return next(new ApiError("You are not login, Please login to get access this route", 401))
+        return next(new ApiError(req.__("youAreNotLoggedToAccess"), 401))
     }
 
     // 2) Verify token (no change happens, expired token)
@@ -102,7 +102,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
     // 3) Check if user exists
     const currentUser = await User.findById(decoded.userId)
     if (!currentUser) {
-        return next(new ApiError("The user that belong to this token does no longer exist", 401))
+        return next(new ApiError(req.__("noUserWithToken"), 401))
     }
 
     // 4) Check if user change his password after token created
@@ -110,7 +110,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
         const passChangedTimestamp = parseInt(currentUser.passwordChangedAt.getTime() / 1000, 10)
         // Password changed after token created (Error)
         if (passChangedTimestamp > decoded.iat) {
-            return next(new ApiError("User recently changed his password. please login again..", 401))
+            return next(new ApiError(req.__("userChangedPasswordRecently"), 401))
         }
     }
 
@@ -125,7 +125,7 @@ exports.allowedTo = (...roles) =>
         // 1) access roles
         // 2) access registered user (req.user.role)
         if (!roles.includes(req.user.role)) {
-            return next(new ApiError("You are not allowed to access this route", 403))
+            return next(new ApiError(req.__("notAlowedRoute"), 403))
         }
         next()
     })
@@ -137,7 +137,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     // 1) Get user by email
     const user = await User.findOne({ email: req.body.email })
     if (!user) {
-        return next(new ApiError(`There is no user with that email ${req.body.email}`, 404))
+        return next(new ApiError(`${req.__("noUserwithEmail")} ${req.body.email}`, 404))
     }
     // 2) If user exist, Generate hash reset random 6 digits and save it in db
     const resetCode = Math.floor(1000 + Math.random() * 9000).toString()
@@ -153,7 +153,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
     // 3) Send the reset code via email
 
-    const message = `Hi ${user.name},\n We received a request to reset the password on your biuoteck Account. \n ${resetCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The Eslm Team`
+    const message = `${req.__("hi")} ${user.name},\n ${req.__("forgotSms")} \n ${"resetCode"} \n ${req.__("forgotSms2")}`
     try {
         await sendSms(user.phone, message, next)
     } catch (err) {
@@ -162,10 +162,10 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
         user.passwordResetVerified = undefined
 
         await user.save()
-        return next(new ApiError("There is an error in sending the sms", 500))
+        return next(new ApiError(req.__("errorSendingSms"), 500))
     }
 
-    res.status(200).json({ status: "Success", message: "Reset code sent to your Sms" })
+    res.status(200).json({ status: "Success", message: req.__("resetDone") })
 })
 
 // @desc    Verify password reset code
@@ -180,7 +180,7 @@ exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
         passwordResetExpires: { $gt: Date.now() },
     })
     if (!user) {
-        return next(new ApiError("Reset code invalid or expired"))
+        return next(new ApiError(req.__("expiredCode"), 400))
     }
 
     // 2) Reset code valid
@@ -199,12 +199,12 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
     // 1) Get user based on email
     const user = await User.findOne({ email: req.body.email })
     if (!user) {
-        return next(new ApiError(`There is no user with email ${req.body.email}`, 404))
+        return next(new ApiError(`${req.__("noUserwithEmail")} ${req.body.email}`, 404))
     }
 
     // 2) Check if reset code verified
     if (!user.passwordResetVerified) {
-        return next(new ApiError("Reset code not verified", 400))
+        return next(new ApiError(req.__("resetCodeInvalid"), 400))
     }
 
     user.password = req.body.newPassword
@@ -226,14 +226,14 @@ exports.verifyEmail = asyncHandler(async (req, res, next) => {
     const user = await User.findById(userId._id)
 
     if (user.verified) {
-        return next(new ApiError("Email already verified", 400))
+        return next(new ApiError(req.__("emailAlreadyVerified"), 400))
     }
     if (user.verifyCode !== req.body.verifyCode) {
-        return next(new ApiError("Verify code invalid or expired", 400))
+        return next(new ApiError(req.__("expiredCodeOrExpired"), 400))
     }
 
     if (user.verifyCodeExpires < Date.now()) {
-        return next(new ApiError("Verify code expired", 400))
+        return next(new ApiError(req.__("expiredCodeOrExpired"), 400))
     }
 
     // const userVerified = User.findByIdAndUpdate(user._id.toString(), { verified: true, verifyCode: undefined, verifyCodeExpires: undefined }, { new: true })
@@ -249,7 +249,7 @@ exports.verifyEmail = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         status: "Success",
-        message: "Email verified",
+        message: req.__("emailVerified"),
         user,
     })
 })
@@ -257,10 +257,10 @@ exports.verifyEmail = asyncHandler(async (req, res, next) => {
 exports.resendVerifyCode = asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user._id)
     if (!user) {
-        return next(new ApiError(`There is no user with email `, 404))
+        return next(new ApiError(`${req.__("noUserwithEmail")}`, 404))
     }
     if (user.verified) {
-        return next(new ApiError("Email already verified", 400))
+        return next(new ApiError(req.__("emailAlreadyVerified"), 400))
     }
     const verifyCode = Math.floor(1000 + Math.random() * 9000).toString()
     const verifyCodeExpires = Date.now() + 10 * 60 * 1000
@@ -269,11 +269,11 @@ exports.resendVerifyCode = asyncHandler(async (req, res, next) => {
     user.verifyCodeExpires = verifyCodeExpires
 
     await user.save()
-    const smsResponse = await sendSms(user.phone, `Welcome to Eslm, your verify code is ${user.verifyCode} , it will expire in 10 minutes `, next)
+    const smsResponse = await sendSms(user.phone, `${req.__("smsFirst")} ${user.verifyCode} ${req.__("smsLast")}`, next)
 
     res.status(200).json({
         status: "Success",
-        message: "Verify code sent to email",
+        message: req.__("verifySend"),
         user,
     })
 })
@@ -289,7 +289,7 @@ exports.GoogleAuth = asyncHandler(async (req, res, next) => {
         //     role: "user",
         // })
         // createSendToken(newUser, 200, res)
-        return next(new ApiError(`There is no user with email ${email}`, 404))
+        return next(new ApiError(`${req.__("noUserwithEmail")} ${req.body.email}`, 404))
     } else {
         const token = createToken(user._id)
         res.status(200).json({ data: user, token })
