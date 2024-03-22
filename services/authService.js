@@ -277,3 +277,21 @@ exports.resendVerifyCode = asyncHandler(async (req, res, next) => {
         user,
     })
 })
+
+exports.GoogleAuth = asyncHandler(async (req, res, next) => {
+    const { email } = req.params
+    const user = await User.findOne({ email })
+    if (!user) {
+        // const newUser = await User.create({
+        //     name: payload.name,
+        //     email: payload.email,
+        //     password: payload.sub,
+        //     role: "user",
+        // })
+        // createSendToken(newUser, 200, res)
+        return next(new ApiError(`There is no user with email ${email}`, 404))
+    } else {
+        const token = createToken(user._id)
+        res.status(200).json({ data: user, token })
+    }
+})

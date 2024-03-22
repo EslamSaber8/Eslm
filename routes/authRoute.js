@@ -12,6 +12,7 @@ const {
     protect,
     verifyEmail,
     resendVerifyCode,
+    GoogleAuth
 } = require("../services/authService")
 const { uploadMultipleImages } = require("../utils/uploadImages")
 const router = express.Router()
@@ -29,5 +30,7 @@ router.post("/verify", verifyEmail)
 router.post("/newVerification", resendVerifyCode)
 
 router.post("/signup", allowedTo("superAdmin"), signupValidator, signup)
+
+router.post("/googleAuth/:email", GoogleAuth)
 
 module.exports = router
