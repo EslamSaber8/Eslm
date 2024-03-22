@@ -13,11 +13,10 @@ const {
   createCategory,
   updateCategory,
   deleteCategory,
-  uploadCategoryImage,
-  resizeImage,
 } = require('../services/categoryService');
 
 const authService = require('../services/authService');
+const { uploadMultipleImages } = require('../utils/uploadImages');
 
 
 
@@ -31,8 +30,7 @@ router
   .post(
     authService.protect,
     authService.allowedTo('admin','superAdmin'),
-    uploadCategoryImage,
-    resizeImage,
+    uploadMultipleImages,
     createCategoryValidator,
     createCategory
   );
@@ -42,8 +40,7 @@ router
   .put(
     authService.protect,
     authService.allowedTo('admin','superAdmin'),
-    uploadCategoryImage,
-    resizeImage,
+    uploadMultipleImages,
     updateCategoryValidator,
     updateCategory
   )

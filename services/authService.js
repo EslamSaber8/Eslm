@@ -34,7 +34,7 @@ exports.signupAs = asyncHandler(async (req, res, next) => {
         password: req.body.password,
         phone: req.body.phone,
         license: req.body.license,
-        idImg:req.body.idImg
+        idImg: req.body.idImg,
     })
 
     // 2- Generate token
@@ -55,8 +55,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
         accountState: "approved",
         password: req.body.password,
         phone: req.body.phone,
-        idImg:req.body.idImg
-
+        idImg: req.body.idImg,
     })
 
     // 2- Generate token
@@ -217,7 +216,7 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
     // 3) if everything is ok, generate token
     const token = createToken(user._id)
-    res.status(200).json({ token })
+    res.status(200).json({ status: "Success", token })
 })
 
 exports.verifyEmail = asyncHandler(async (req, res, next) => {
@@ -277,4 +276,22 @@ exports.resendVerifyCode = asyncHandler(async (req, res, next) => {
         message: "Verify code sent to email",
         user,
     })
+})
+
+exports.GoogleAuth = asyncHandler(async (req, res, next) => {
+    const { email } = req.params
+    const user = await User.findOne({ email })
+    if (!user) {
+        // const newUser = await User.create({
+        //     name: payload.name,
+        //     email: payload.email,
+        //     password: payload.sub,
+        //     role: "user",
+        // })
+        // createSendToken(newUser, 200, res)
+        return next(new ApiError(`There is no user with email ${email}`, 404))
+    } else {
+        const token = createToken(user._id)
+        res.status(200).json({ data: user, token })
+    }
 })

@@ -24,6 +24,8 @@ const fieldsUpload = upload.fields([
     { name: "license", maxCount: 1 },
     { name: "idImg", maxCount: 1 },
     { name: "image", maxCount: 1 },
+    { name: "images", maxCount: 5 },
+    { name: "imageCover", maxCount: 1 },
     { name: "imageid", maxCount: 10 },
 ])
 
@@ -38,6 +40,18 @@ exports.uploadMultipleImages = asyncHandler(async (req, res, next) => {
         }
         if (req.files.idImg) {
             req.body.idImg = domainName + req.files.idImg[0].filename
+        }
+        if (req.files.image) {
+            req.body.image = domainName + req.files.image[0].filename
+        }
+        if (req.files.images) {
+            req.body.images = req.files.images.map((file) => domainName + file.filename)
+        }
+        if (req.files.imageCover) {
+            req.body.imageCover = domainName + req.files.imageCover[0].filename
+        }
+        if (req.files.imageid) {
+            req.body.imageid = req.files.imageid.map((file) => domainName + file.filename)
         }
         next()
     })
