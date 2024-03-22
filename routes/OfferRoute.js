@@ -13,14 +13,14 @@ router.use(authService.protect);
 router
   .route('/')
   .get(authService.allowedTo('admin', 'superAdmin'), getOffers)
-  .post(authService.allowedTo('driver','workshop',"vindor"),createOfferValidator, createOffer);
+  .post(authService.allowedTo('driver','workshop',"vendor"),createOfferValidator, createOffer);
 router
   .route('/:id')
   .get(getOfferValidator,getOffer)
-  .put(authService.protect,authService.allowedTo('driver','workshop',"vindor"), updateOfferValidator, updateOffer)
+  .put(authService.protect,authService.allowedTo('driver','workshop',"vendor"), updateOfferValidator, updateOffer)
   .delete(
     authService.protect,
-    authService.allowedTo('driver','workshop',"vindor",'admin', 'superAdmin'),
+    authService.allowedTo('driver','workshop',"vendor",'admin', 'superAdmin'),
     deleteOfferValidator,
     deleteOffer
   );
