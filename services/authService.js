@@ -16,7 +16,7 @@ const { sendSms } = require("../utils/sendSms")
 // @access  Public
 exports.signupAs = asyncHandler(async (req, res, next) => {
     // 1- Create user
-    const allowedRoles = ["workshop", "driver"]
+    const allowedRoles = ["workshop", "driver","vindor"]
     if (!allowedRoles.includes(req.params.role)) {
         return next(new ApiError(`You can't sign up as ${req.params.role}`, 400))
     }

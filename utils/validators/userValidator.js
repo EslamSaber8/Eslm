@@ -40,12 +40,8 @@ exports.createUserValidator = [
     .isMobilePhone(['ar-EG', 'ar-SA'])
     .withMessage('Invalid phone number only accepted Egy and SA Phone numbers'),
 
-  check('license')  
-  .notEmpty()
-  .withMessage('license required'),
-  check('idImg')  
-  .notEmpty()
-  .withMessage(' idImg required'),
+  check('license') .optional(),
+  check('idImg') .optional(),
   check('role').optional(),
 
   validatorMiddleware,

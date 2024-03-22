@@ -31,7 +31,7 @@ router
   .get(getProducts)
   .post(
     authService.protect,
-    authService.allowedTo('admin','superAdmin'),
+    authService.allowedTo('admin','superAdmin',"vindor"),
     uploadMultipleImages,
     createProductValidator,
     createProduct
@@ -41,14 +41,14 @@ router
   .get(getProductValidator, getProduct)
   .put(
     authService.protect,
-    authService.allowedTo('admin','superAdmin'),
+    authService.allowedTo('admin','superAdmin',"vindor"),
     uploadMultipleImages,
     updateProductValidator,
     updateProduct
   )
   .delete(
     authService.protect,
-    authService.allowedTo('admin','superAdmin'),
+    authService.allowedTo('admin','superAdmin',"vindor"),
     deleteProductValidator,
     deleteProduct
   );

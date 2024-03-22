@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
     passwordResetVerified: Boolean,
     role: {
       type: String,
-      enum: ['workshop', 'driver','insurance','admin','superAdmin'],
+      enum: ['workshop', 'driver','insurance',"vindor",'admin','superAdmin'],
       default:"driver"
     },
     active: {
