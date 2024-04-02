@@ -15,6 +15,7 @@ exports.createReportValidator = [
     body('carModel').isString().notEmpty().withMessage('Car model is required'),
     // Validate carNumber field
     body('carNumber').isString().notEmpty().withMessage('Car number is required'),
+    body("manufactureYear").toDate().notEmpty() .withMessage("Date year is required"),
     // Validate reportDescription field
     body('reportDescription').isString().notEmpty().withMessage('Report description is required'),
     // Validate locationOfVehicle field

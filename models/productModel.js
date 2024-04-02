@@ -27,6 +27,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    year:Date,
     price: {
       type: Number,
       required: [true, 'Product price is required'],

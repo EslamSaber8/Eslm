@@ -8,8 +8,8 @@ const reportSchema = new mongoose.Schema(
         carMake: String,
         carModel: String,
         carNumber: String,
-
-        reportDescription: String,
+        manufactureYear:Date,
+        reportDescription: Date,
         partsList: [String], // Optional, array of parts
         locationOfVehicle: String,
         /*if we make workshop model 

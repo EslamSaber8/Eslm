@@ -5,6 +5,12 @@ const OfferSchema = new mongoose.Schema({
     price: Number,
     deadline: Date,
     partPrice: Number,
+    description: {
+        type: String,
+        required: [true, 'Product description is required'],
+        minlength: [20, 'Too short product description'],
+      },
+
     createdBy: {
         type: mongoose.Schema.ObjectId,
         ref: "User",

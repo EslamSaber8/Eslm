@@ -12,6 +12,11 @@ exports.createOfferValidator = [
 
         .notEmpty()
         .withMessage("Date is required"),
+    check('description')
+    .notEmpty()
+    .withMessage('Product description is required')
+    .isLength({ max: 2000 })
+    .withMessage('Too long description'),
     body("partPrice").isNumeric().optional(),
 
     check("report")

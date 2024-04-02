@@ -28,6 +28,11 @@ exports.createProductValidator = [
     .optional()
     .isNumeric()
     .withMessage('Product quantity must be a number'),
+    body("year")
+    .toDate()
+
+    .notEmpty()
+    .withMessage("Date year is required"),
   check('price')
     .notEmpty()
     .withMessage('Product price is required')
