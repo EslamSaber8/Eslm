@@ -57,17 +57,21 @@ exports.getOne = (Model, populationOpt) =>
 
 exports.getAll = (Model, modelName = "") =>
     asyncHandler(async (req, res) => {
-        const search = req.query.search
-            ? {
-                  $or: [{ role: { $regex: req.query.search, $options: "i" } }],
-              }
-            : {}
+        const search =
+            req.query != null && Object.keys(req.query).length > 0
+                ? {
+                      $and: Object.keys(req.query).map((key) => ({
+                          [key]: { $regex: req.query[key], $options: "i" },
+                      })),
+                  }
+                : {}
+                // console.log(search);
 
         // Build query
         const documentsCounts = await Model.countDocuments()
         const apiFeatures = new ApiFeatures(Model.find().where(search), req.query)
             .paginate(documentsCounts)
-            .filter()
+            // .filter()
             .search(modelName)
             .limitFields()
             .sort()
