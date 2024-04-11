@@ -14,6 +14,14 @@ const productSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
     },
+    make:{
+      type: String,
+      required: true,
+    },
+    model:{
+      type: String,
+      required: true,
+    },
     description: {
       type: String,
       required: [true, 'Product description is required'],
