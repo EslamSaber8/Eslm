@@ -57,11 +57,14 @@ exports.getOne = (Model, populationOpt) =>
 
 exports.getAll = (Model, modelName = "") =>
     asyncHandler(async (req, res) => {
-        const search = req.query.search
-            ? {
-                  $or: [{ role: { $regex: req.query.search, $options: "i" } }],
-              }
-            : {}
+        const search =
+            req.query != null && Object.keys(req.query).length > 0
+                ? {
+                      $or: Object.keys(req.query).map((key) => ({
+                          [key]: { $regex: req.query[key], $options: "i" },
+                      })),
+                  }
+                : {}
 
         // Build query
         const documentsCounts = await Model.countDocuments()
