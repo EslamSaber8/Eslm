@@ -18,6 +18,7 @@ const categoryRoute = require("./routes/categoryRoute")
 const brandRoute = require("./routes/brandRoute")
 const productRoute = require("./routes/productRoute")
 const reviewRoute = require("./routes/reviewRoute")
+const bannerRoute = require("./routes/bannerRoute")
 
 // Connect with db
 dbConnection()
@@ -65,6 +66,7 @@ app.use("/api/v1/categories", categoryRoute)
 app.use("/api/v1/brands", brandRoute)
 app.use("/api/v1/products", productRoute)
 app.use("/api/v1/reviews", reviewRoute)
+app.use("/api/v1/banner", bannerRoute)
 
 app.get("/", (req, res) => {
     res.send(req.__("welcome"))
