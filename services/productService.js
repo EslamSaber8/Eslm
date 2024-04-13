@@ -1,5 +1,5 @@
 
-
+const asyncHandler = require("express-async-handler")
 const factory = require('./handlersFactory');
 const Product = require('../models/productModel');
 
@@ -18,6 +18,7 @@ exports.getProduct = factory.getOne(Product, 'reviews');
 // @route   POST  /api/v1/products
 // @access  Private
 exports.createProduct = factory.createOne(Product);
+// exports.createProduct = 
 // @desc    Update specific product
 // @route   PUT /api/v1/products/:id
 // @access  Private

@@ -60,20 +60,25 @@ exports.getAll = (Model, modelName = "") =>
         const search =
             req.query != null && Object.keys(req.query).length > 0
                 ? {
-                      $and: Object.keys(req.query).map((key) => ({
-                          [key]: { $regex: req.query[key], $options: "i" },
-                      })),
+                      $and: Object.keys(req.query).map((key) => {
+                          if (key != "search" && key != "_id" && key != "category" && key != "createdBy") {
+                              {
+                                  if (req.query[key] != null) return { [key]: { $regex: req.query[key], $options: "i" } }
+                              }
+                          } else {
+                              if (req.query[key] != null) return { [key]: req.query[key] }
+                          }
+                      }),
                   }
                 : {}
-                // console.log(search);
 
         // Build query
         const documentsCounts = await Model.countDocuments()
         const apiFeatures = new ApiFeatures(Model.find().where(search), req.query)
             .paginate(documentsCounts)
             // .filter()
-            .search(modelName)
-            .limitFields()
+            // .search(modelName)
+            // .limitFields()
             .sort()
 
         // Execute query
