@@ -111,7 +111,7 @@ exports.clearCart = asyncHandler(async (req, res, next) => {
 exports.updateCartItemQuantity = asyncHandler(async (req, res, next) => {
     const { quantity } = req.body
 
-    const cart = await Cart.findOne({ user: req.user._id })
+    const cart = await Cart.findOne({ user: req.user._id }).populate("cartItems.product")
     if (!cart) {
         return next(new ApiError(`there is no cart for user ${req.user._id}`, 404))
     }
