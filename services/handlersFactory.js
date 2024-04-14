@@ -63,7 +63,7 @@ exports.getAll = (Model, modelName = "") =>
             req.query != null && Object.keys(req.query).length > 0
                 ? {
                       $and: Object.keys(req.query).map((key) => {
-                          if (key != "search" && key != "_id" && key != "category" && key != "createdBy") {
+                          if (key != "search" && key != "_id" && key != "category" && key != "createdBy" && key != "verified") {
                               {
                                   if (req.query[key] != null) return { [key]: { $regex: req.query[key], $options: "i" } }
                               }

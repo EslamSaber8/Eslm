@@ -18,9 +18,11 @@ const categoryRoute = require("./routes/categoryRoute")
 const brandRoute = require("./routes/brandRoute")
 const productRoute = require("./routes/productRoute")
 const reviewRoute = require("./routes/reviewRoute")
+const bannerRoute = require("./routes/bannerRoute")
 const couponRoute = require('./routes/couponRoute');
 const cartRoute = require('./routes/cartRoute');
 const orderRoute = require('./routes/orderRoute');
+
 
 // Connect with db
 dbConnection()
@@ -68,6 +70,9 @@ app.use("/api/v1/categories", categoryRoute)
 app.use("/api/v1/brands", brandRoute)
 app.use("/api/v1/products", productRoute)
 app.use("/api/v1/reviews", reviewRoute)
+
+app.use("/api/v1/banner", bannerRoute)
+
 app.use('/api/v1/coupons', couponRoute);
  app.use('/api/v1/cart', cartRoute);
  app.use('/api/v1/orders', orderRoute);
