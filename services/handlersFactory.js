@@ -57,6 +57,8 @@ exports.getOne = (Model, populationOpt) =>
 
 exports.getAll = (Model, modelName = "") =>
     asyncHandler(async (req, res) => {
+     let filter = {};
+      if (req.filterObj) { filter = req.filterObj;}
         const search =
             req.query != null && Object.keys(req.query).length > 0
                 ? {
@@ -74,7 +76,7 @@ exports.getAll = (Model, modelName = "") =>
 
         // Build query
         const documentsCounts = await Model.countDocuments()
-        const apiFeatures = new ApiFeatures(Model.find().where(search), req.query)
+        const apiFeatures = new ApiFeatures(Model.find(filter).where(search), req.query)
             .paginate(documentsCounts)
             // .filter()
             // .search(modelName)
@@ -87,3 +89,4 @@ exports.getAll = (Model, modelName = "") =>
 
         res.status(200).json({ results: documents.length, paginationResult, data: documents })
     })
+   

@@ -21,6 +21,7 @@ const reviewRoute = require("./routes/reviewRoute")
 const bannerRoute = require("./routes/bannerRoute")
 const couponRoute = require('./routes/couponRoute');
 const cartRoute = require('./routes/cartRoute');
+const orderRoute = require('./routes/orderRoute');
 
 
 // Connect with db
@@ -74,6 +75,9 @@ app.use("/api/v1/banner", bannerRoute)
 
 app.use('/api/v1/coupons', couponRoute);
  app.use('/api/v1/cart', cartRoute);
+ app.use('/api/v1/orders', orderRoute);
+
+
 
 app.get("/", (req, res) => {
     res.send(req.__("welcome"))
