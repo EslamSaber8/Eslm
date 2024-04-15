@@ -26,7 +26,7 @@ exports.createProductValidator = [
         .withMessage("Product price is required")
         .isNumeric()
         .withMessage("Product price must be a number")
-        .isLength({ max: 32 })
+        .isLength({ max: 8 })
         .withMessage("To long price"),
     check("priceAfterDiscount")
         .optional()
