@@ -147,6 +147,7 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
         {
             name: req.body.name,
             email: req.body.email,
+            avatar: req.body.avatar,
             phone: req.body.phone,
             license: req.body.license,
             idImg: req.body.idImg,
