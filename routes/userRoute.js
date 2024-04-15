@@ -24,6 +24,7 @@ const {
 } = require('../services/userService');
 
 const authService = require('../services/authService');
+const { uploadMultipleImages } = require('../utils/uploadImages');
 
 const router = express.Router();
 
@@ -31,7 +32,7 @@ router.use(authService.protect);
 
 router.get('/getMe', getLoggedUserData, getUser);
 router.put('/changeMyPassword', updateLoggedUserPassword);
-router.put('/updateMe', updateLoggedUserValidator, updateLoggedUserData);
+router.put('/updateMe',uploadMultipleImages, updateLoggedUserValidator, updateLoggedUserData);
 router.delete('/deleteMe', deleteLoggedUserData);
 
 // Admin
