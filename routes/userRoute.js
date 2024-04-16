@@ -45,11 +45,11 @@ router.put(
 router
   .route('/')
   .get(getUsers)
-  .post(uploadUserImage,  createUserValidator, createUser);
+  .post(uploadMultipleImages,  createUserValidator, createUser);
 router
   .route('/:id')
   .get(getUserValidator, getUser)
-  .put(uploadUserImage,  updateUserValidator, updateUser)
+  .put(uploadMultipleImages,  updateUserValidator, updateUser)
   .delete(deleteUserValidator, deleteUser);
 
   router.use(authService.allowedTo('superAdmin'));

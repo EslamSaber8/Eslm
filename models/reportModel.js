@@ -8,21 +8,23 @@ const reportSchema = new mongoose.Schema(
         carMake: String,
         carModel: String,
         carNumber: String,
-        manufactureYear:Date,
-        reportDescription: Date,
+        manufactureYear: Date,
+        reportDescription: String,
         partsList: [String], // Optional, array of parts
         locationOfVehicle: String,
-        /*if we make workshop model 
-       selectWorkshop: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'workshop',
-    },*/
-        selectWorkshop: String,
+        selectWorkshop: Boolean,
+        allowedWorkshop: [
+            {
+                type: mongoose.Schema.ObjectId,
+                ref: "workshop",
+            },
+        ],
+
         createdBy: {
             type: mongoose.Schema.ObjectId,
             ref: "User",
         },
-        uploadFiles: [String], // Optional, array of file paths
+        uploadFiles: String, // Optional, array of file paths
     },
     {
         timestamps: true,
