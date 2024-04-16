@@ -11,7 +11,7 @@ const {
 
 } = require('../services/bannerService');
 const { uploadMultipleImages } = require('../utils/uploadImages');
-const { createBannerValidator,updateBannerValidator,deleteBannerValidator, getBannerValidator } = require('../utils/validators/bannerValidator');
+const {/* createBannerValidator,*/updateBannerValidator,deleteBannerValidator, getBannerValidator } = require('../utils/validators/bannerValidator');
 
 const router = express.Router();
 
@@ -22,7 +22,7 @@ router
     authService.protect,
     authService.allowedTo('admin','superAdmin'),
     uploadMultipleImages,
-    createBannerValidator,
+   /* createBannerValidator,*/
     createBanner
   );
 router
