@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler")
 const ApiError = require("../utils/apiError")
 const ApiFeatures = require("../utils/apiFeatures")
+const mongoose = require("mongoose")
 
 exports.deleteOne = (Model) =>
     asyncHandler(async (req, res, next) => {
@@ -57,18 +58,30 @@ exports.getOne = (Model, populationOpt) =>
 
 exports.getAll = (Model, modelName = "") =>
     asyncHandler(async (req, res) => {
-     let filter = {};
-      if (req.filterObj) { filter = req.filterObj;}
+        let filter = {}
+        if (req.filterObj) {
+            filter = req.filterObj
+        }
         const search =
             req.query != null && Object.keys(req.query).length > 0
                 ? {
                       $and: Object.keys(req.query).map((key) => {
-                          if (key != "search" && key != "_id" && key != "category" && key != "createdBy" && key != "verified") {
-                              {
-                                  if (req.query[key] != null) return { [key]: { $regex: req.query[key], $options: "i" } }
+                          if (req.query[key] != null && req.query[key] != "null" && req.query[key] != "") {
+                              if (
+                                  key != "search" &&
+                                  !mongoose.Types.ObjectId.isValid(req.query[key]) &&
+                                  typeof req.query[key] != "boolean" &&
+                                  key != "verified" &&
+                                  key != "year"
+                              ) {
+                                  {
+                                      if (req.query[key] != null) return { [key]: { $regex: req.query[key], $options: "i" } }
+                                  }
+                              } else {
+                                  if (req.query[key] != null) return { [key]: req.query[key] }
                               }
                           } else {
-                              if (req.query[key] != null) return { [key]: req.query[key] }
+                              return {}
                           }
                       }),
                   }
@@ -89,4 +102,3 @@ exports.getAll = (Model, modelName = "") =>
 
         res.status(200).json({ results: documents.length, paginationResult, data: documents })
     })
-   
