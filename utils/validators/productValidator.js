@@ -2,6 +2,7 @@ const slugify = require("slugify")
 const { check, body } = require("express-validator")
 const validatorMiddleware = require("../../middlewares/validatorMiddleware")
 const Category = require("../../models/categoryModel")
+const productModel = require("../../models/productModel")
 
 exports.createProductValidator = [
     check("title")
@@ -16,11 +17,9 @@ exports.createProductValidator = [
     check("description").notEmpty().withMessage("Product description is required").isLength({ max: 2000 }).withMessage("Too long description"),
     check("quantity").notEmpty().withMessage("Product quantity is required").isNumeric().withMessage("Product quantity must be a number"),
     check("sold").optional().isNumeric().withMessage("Product quantity must be a number"),
-    body("year")
-        .toDate()
 
-        .notEmpty()
-        .withMessage("Date year is required"),
+    body("year").toDate().notEmpty().withMessage("Date year is required"),
+
     check("price")
         .notEmpty()
         .withMessage("Product price is required")
@@ -28,53 +27,31 @@ exports.createProductValidator = [
         .withMessage("Product price must be a number")
         .isLength({ max: 8 })
         .withMessage("To long price"),
-        check("Discount")
-        .optional()
-        .isNumeric()
-        .withMessage("Product Discount must be a number")
-        .custom((dis) => {
-            if(dis>100) {
-                return Promise.reject(new Error('Discount  must be lower than 100%'))
-            }
-            req.body.priceAfterDiscount=req.body.price-(req.body.price*req.body.Discount)/100
-        }
-      
-    ),
-check("Discount")
-        .optional()
-        .isNumeric()
-        .withMessage("Product Discount must be a number")
 
+    check("Discount")
+        .optional()
+        .isNumeric()
+        .withMessage("Product Discount must be a number")
         .custom((value, { req }) => {
-            if (value >100) {
-                throw new Error('Discount  must be lower than 100%')
+            if (value > 100) {
+                throw new Error("Discount  must be lower than 100%")
             }
-            req.body.priceAfterDiscount=req.body.price-(req.body.price*req.body.Discount)/100;
+            req.body.priceAfterDiscount = req.body.price - (req.body.price * req.body.Discount) / 100
             return true
         }),
 
     check("fixed")
-    .optional()
-    .isNumeric()
-    .withMessage("fixed price must be a number")
-    .custom((value, { req }) => {
-        if (req.body.price <= value) {
-            throw new Error("fixedPrice must be lower than price")
-        }
-        req.body.priceAfterDiscount=req.body.price-req.body.fixed;
-        return true
-    }),
+        .optional()
+        .isNumeric()
+        .withMessage("fixed price must be a number")
+        .custom((value, { req }) => {
+            if (req.body.price <= value) {
+                throw new Error("fixedPrice must be lower than price")
+            }
+            req.body.priceAfterDiscount = req.body.price - req.body.fixed
+            return true
+        }),
 
-
-
-
-
-
-
-
-
-
-        
     check("priceAfterDiscount")
         .optional()
         .isNumeric()
@@ -154,17 +131,20 @@ exports.getProductValidator = [check("id").isMongoId().withMessage("Invalid ID f
 
 exports.updateProductValidator = [
     check("id").isMongoId().withMessage("Invalid ID formate"),
+
     check("Discount")
-    .optional()
-    .isNumeric()
-    .withMessage("Product Discount must be a number")
-    .custom((dis) => {
-        if(dis>100) {
-            return Promise.reject(new Error('Discount  must be lower than 100%'))
-        }
-    }
-  
-),
+        .optional()
+        .isNumeric()
+        .withMessage("Product Discount must be a number")
+        .custom(async (value, { req }) => {
+            if (value > 100) {
+                throw new Error("Discount  must be lower than 100%")
+            }
+            const product = await productModel.findById(req.params.id)
+            req.body.priceAfterDiscount = product.price - (product.price * req.body.Discount) / 100
+            return true
+        }),
+
     body("title")
         .optional()
         .custom((val, { req }) => {

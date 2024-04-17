@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler")
 const factory = require("./handlersFactory")
 const Product = require("../models/productModel")
+const ApiError = require("../utils/apiError")
 
 // @desc    Get list of products
 // @route   GET /api/v1/products
@@ -52,5 +53,34 @@ exports.netAndSales = asyncHandler(async (req, res) => {
             net,
             sold,
         },
+    })
+})
+
+exports.updateProducts = asyncHandler(async (req, res) => {
+    const { products, Discount, fixed } = req.body
+    if (Discount && fixed) {
+        return next(new ApiError(`You can't set both fixed and percentage discount`, 400))
+    }
+
+    if (!products || products.length === 0) {
+        return next(new ApiError(`No products found`, 400))
+    }
+
+    products.forEach(async (product) => {
+        const update = await Product.findById(product._id).populate("createdBy")
+        if (update.createdBy.id !== req.user.id) {
+            if (Discount) {
+                update.Discount = Discount
+                update.priceAfterDiscount = product.price - (product.price * Discount) / 100
+            } else if (fixed) {
+                update.Discount = fixed
+                update.priceAfterDiscount = product.price - fixed
+            }
+            await update.save()
+        }
+    })
+    res.status(200).json({
+        status: "success",
+        message: "Products updated successfully",
     })
 })
