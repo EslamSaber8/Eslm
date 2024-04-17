@@ -8,11 +8,11 @@ const { createBannerValidator, updateBannerValidator, deleteBannerValidator, get
 
 const router = express.Router()
 
+
 router.route("/").get(getBanners).post(
     authService.protect,
     authService.allowedTo("admin", "superAdmin"),
     uploadMultipleImages,
-    // createBannerValidator,
     createBanner
 )
 router

@@ -28,6 +28,53 @@ exports.createProductValidator = [
         .withMessage("Product price must be a number")
         .isLength({ max: 8 })
         .withMessage("To long price"),
+        check("Discount")
+        .optional()
+        .isNumeric()
+        .withMessage("Product Discount must be a number")
+        .custom((dis) => {
+            if(dis>100) {
+                return Promise.reject(new Error('Discount  must be lower than 100%'))
+            }
+            req.body.priceAfterDiscount=req.body.price-(req.body.price*req.body.Discount)/100
+        }
+      
+    ),
+check("Discount")
+        .optional()
+        .isNumeric()
+        .withMessage("Product Discount must be a number")
+
+        .custom((value, { req }) => {
+            if (value >100) {
+                throw new Error('Discount  must be lower than 100%')
+            }
+            req.body.priceAfterDiscount=req.body.price-(req.body.price*req.body.Discount)/100;
+            return true
+        }),
+
+    check("fixed")
+    .optional()
+    .isNumeric()
+    .withMessage("fixed price must be a number")
+    .custom((value, { req }) => {
+        if (req.body.price <= value) {
+            throw new Error("fixedPrice must be lower than price")
+        }
+        req.body.priceAfterDiscount=req.body.price-req.body.fixed;
+        return true
+    }),
+
+
+
+
+
+
+
+
+
+
+        
     check("priceAfterDiscount")
         .optional()
         .isNumeric()
@@ -107,6 +154,17 @@ exports.getProductValidator = [check("id").isMongoId().withMessage("Invalid ID f
 
 exports.updateProductValidator = [
     check("id").isMongoId().withMessage("Invalid ID formate"),
+    check("Discount")
+    .optional()
+    .isNumeric()
+    .withMessage("Product Discount must be a number")
+    .custom((dis) => {
+        if(dis>100) {
+            return Promise.reject(new Error('Discount  must be lower than 100%'))
+        }
+    }
+  
+),
     body("title")
         .optional()
         .custom((val, { req }) => {
