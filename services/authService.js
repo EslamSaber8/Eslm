@@ -295,3 +295,14 @@ exports.GoogleAuth = asyncHandler(async (req, res, next) => {
         res.status(200).json({ data: user, token })
     }
 })
+
+exports.remoteLogin = asyncHandler(async (req, res, next) => {
+    console.log(req.body)
+    // const user = await User.findOne({ email }).select("+password")
+    // if (!user || !(await bcrypt.compare(password, user.password))) {
+    //     return next(new ApiError(req.__("incorrectEmailOrPass"), 401))
+    // }
+    // const token = createToken(user._id)
+    res.status(200).json({ data: req.body, token: "token" })
+    // res.status(200).json({ data: user, token })
+})

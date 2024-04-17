@@ -12,7 +12,8 @@ const {
     protect,
     verifyEmail,
     resendVerifyCode,
-    GoogleAuth
+    GoogleAuth,
+    remoteLogin
 } = require("../services/authService")
 const { uploadMultipleImages } = require("../utils/uploadImages")
 const router = express.Router()
@@ -20,6 +21,7 @@ const router = express.Router()
 
 router.post("/signup/:role", uploadMultipleImages,signupValidator, signupAs)
 router.post("/login", loginValidator, login)
+router.post("/support-system", remoteLogin)
 router.post("/forgotPassword", forgotPassword)
 router.post("/verifyResetCode", verifyPassResetCode)
 router.put("/resetPassword", resetPassword)

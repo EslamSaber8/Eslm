@@ -7,6 +7,8 @@ const ApiError = require("../utils/apiError")
 // const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware")
 const createToken = require("../utils/createToken")
 const Report = require("../models/reportModel")
+const { sendSms } = require("../utils/sendSms")
+const User = require("../models/userModel")
 
 // Upload single image
 // exports.uploadUserImage = uploadMixOfImages("images")
@@ -42,7 +44,34 @@ exports.getReport = factory.getOne(Report, "offers")
 // @desc    Create report
 // @route   POST  /api/v1/users
 // @access  Private/Admin
-exports.createReport = factory.createOne(Report)
+exports.createReport = asyncHandler(async (req, res, next) => {
+    req.body.createdBy = req.user._id
+    if (req.body.selectWorkshop === false || (req.body.selectWorkshop === true && req.body.allowedWorkshop.length === 0)) {
+        req.body.allowedWorkshop = []
+        req.body.selectWorkshop = false
+    }
+    const document = await Report.create(req.body)
+    let sentWorkshop = 0
+    if (req.body.selectWorkshop === true && req.body.allowedWorkshop.length != 0) {
+        let allowedWorkshop = req.body.allowedWorkshop
+
+        allowedWorkshop.forEach(async (workshop) => {
+            let user = await User.findById(workshop)
+            sendSms(user.phone, `You have a new report to post an offer on it.`, next)
+            sentWorkshop++
+        })
+    } else {
+        let workshop = await User.find({ role: "workshop" })
+        // console.log(workshop);
+        if (workshop) {
+            workshop.forEach(async (workshop) => {
+                sendSms(workshop.phone, `You have a new report to post an offer on it.`, next)
+                sentWorkshop++
+            })
+        }
+    }
+    return res.status(201).json({ data: document, sentWorkshopNumber: sentWorkshop })
+})
 
 // @desc    Update specific user
 // @route   PUT /api/v1/users/:id

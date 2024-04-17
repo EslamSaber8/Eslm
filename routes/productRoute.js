@@ -14,6 +14,7 @@ const {
   deleteProduct,
   uploadProductImages,
   resizeProductImages,
+  netAndSales,
 } = require('../services/productService');
 const authService = require('../services/authService');
 const reviewsRoute = require('./reviewRoute');
@@ -52,5 +53,8 @@ router
     deleteProductValidator,
     deleteProduct
   );
+
+
+router.get('/netAndSales', authService.protect, authService.allowedTo('admin','superAdmin',"vendor"), netAndSales);
 
 module.exports = router;
