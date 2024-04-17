@@ -1,3 +1,4 @@
+const { strip } = require("colors")
 const mongoose = require("mongoose")
 
 const productSchema = new mongoose.Schema(
@@ -42,6 +43,14 @@ const productSchema = new mongoose.Schema(
             trim: true,
             max: [20000000, "Too long product price"],
         },
+        Discount:{
+            type:Number,
+            default: 0,
+       }, 
+       fixed:{
+        type:Number,
+        default:0,
+       },
         priceAfterDiscount: {
             type: Number,
         },
