@@ -16,6 +16,7 @@ const {
     resizeProductImages,
     netAndSales,
     updateProducts,
+    getAllOffers,
 } = require("../services/productService")
 const authService = require("../services/authService")
 const reviewsRoute = require("./reviewRoute")
@@ -28,6 +29,7 @@ const router = express.Router()
 // GET    /products/jkshjhsdjh2332n/reviews/87487sfww3
 router.get("/netAndSales", authService.protect, authService.allowedTo("admin", "superAdmin", "vendor"), netAndSales)
 router.put("/updateProducts", authService.protect, authService.allowedTo("admin", "superAdmin", "vendor"), updateProducts)
+router.get("/allOffers",authService.protect, authService.allowedTo("admin", "superAdmin", "vendor"), getAllOffers)
 
 router.use("/:productId/reviews", reviewsRoute)
 

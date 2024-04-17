@@ -84,3 +84,31 @@ exports.updateProducts = asyncHandler(async (req, res) => {
         message: "Products updated successfully",
     })
 })
+
+exports.getAllOffers = asyncHandler(async (req, res) => {
+    const { type } = req.query // Assuming 'type' query parameter specifies 'discount' or 'fixed'
+    let filter = {}
+    if (type === "discount") {
+        filter = { Discount: { $gt: 0 } } // Filter products with discount greater than 0
+    } else if (type === "fixed") {
+        filter = { fixed: { $gt: 0 } } // Filter products with fixed price greater than 0
+    } else if (type === "either") {
+        filter = {
+            $or: [
+                { Discount: { $gt: 0 } }, // Products with discount greater than 0
+                { fixed: { $gt: 0 } }, // Products with fixed price greater than 0
+            ],
+            $and: [
+                { createdBy: req.user.id }, // Products created by the user
+            ],
+        }
+    }
+    const products = await Product.find(filter)
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            products,
+        },
+    })
+})
