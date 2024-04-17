@@ -2,6 +2,7 @@
 const asyncHandler = require("express-async-handler")
 const factory = require('./handlersFactory');
 const Product = require('../models/productModel');
+const { query } = require("express");
 
 
 // @desc    Get list of products
@@ -28,3 +29,29 @@ exports.updateProduct = factory.updateOne(Product);
 // @route   DELETE /api/v1/products/:id
 // @access  Private
 exports.deleteProduct = factory.deleteOne(Product);
+
+
+
+
+// exports.applyDiscount = asyncHandler(async (req, res, next) => {
+//         const { id } = req.params
+//         // 1) Build query
+//         let product = Product.findById(id)  
+//         dis=req.body.dis;
+//         const document = await product
+//         if (!document) {
+//             return next(new ApiError(`No product for this id ${id}`, 404))
+//         }
+//         res.status(200).json({ data: document })
+//     })
+
+//     // 3) Calculate price after priceAfterDiscount
+//     const PriceAfterDiscount = (product.price - (product.price * dis) / 100).toFixed(2) // 99.23
+
+//     product.PriceAfterDiscount =PriceAfterDiscount
+//     await product.save()
+
+//     res.status(200).json({
+//         status: "success",
+//         data: product,
+//     })
