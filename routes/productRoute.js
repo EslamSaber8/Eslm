@@ -25,6 +25,8 @@ const router = express.Router();
 // POST   /products/jkshjhsdjh2332n/reviews
 // GET    /products/jkshjhsdjh2332n/reviews
 // GET    /products/jkshjhsdjh2332n/reviews/87487sfww3
+router.get('/netAndSales', authService.protect, authService.allowedTo('admin','superAdmin',"vendor"), netAndSales);
+
 router.use('/:productId/reviews', reviewsRoute);
 
 router
@@ -55,6 +57,5 @@ router
   );
 
 
-router.get('/netAndSales', authService.protect, authService.allowedTo('admin','superAdmin',"vendor"), netAndSales);
 
 module.exports = router;
