@@ -2,9 +2,7 @@ const mongoose = require("mongoose")
 // 1- Create Schema
 const bannerSchema = new mongoose.Schema(
     {
-       
- image: [String],
-      
+        image: String,
     },
     { timestamps: true }
 )

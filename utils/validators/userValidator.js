@@ -59,14 +59,21 @@ exports.updateUserValidator = [
         .optional()
         .isEmail()
         .withMessage("Invalid email address")
-        .custom((val) =>
-            User.findOne({ email: val }).then((user) => {
-                if (user) {
-                    return Promise.reject(new Error("E-mail already in user"))
+        .custom((val, { req }) => {
+            User.findById(req.params.id).then((user) => {
+                if (user.email != val) {
+                    User.findOne({ email: val }).then((user) => {
+                        if (user) {
+                            return Promise.reject(new Error("E-mail already in user"))
+                        }
+                    })
                 }
+                return true
             })
-        ),
-    check("phone").optional().isMobilePhone(["ar-SA"]).withMessage("Invalid phone number only accepted SA Phone numbers"),
+
+            return true
+        }),
+    check("phone").optional().isMobilePhone(["ar-SA"], ["ar-EG"]).withMessage("Invalid phone number only accepted SA Phone numbers"),
 
     check("idImg").optional(),
     check("role").optional(),
@@ -114,7 +121,6 @@ exports.updateLoggedUserValidator = [
         .isEmail()
         .withMessage("Invalid email address")
         .custom((val, { req }) => {
-            console.log(req.user.email, val)
             if (req.user.email != val) {
                 User.findOne({ email: val }).then((user) => {
                     if (user) {
@@ -124,8 +130,10 @@ exports.updateLoggedUserValidator = [
             } else {
                 return true
             }
+
+            return true
         }),
-    check("phone").optional().isMobilePhone(["ar-SA"]).withMessage("Invalid phone number only accepted Saudi Arabia Phone numbers"),
+    check("phone").optional().isMobilePhone(["ar-SA"], ["ar-EG"]).withMessage("Invalid phone number only accepted Saudi Arabia Phone numbers"),
 
     validatorMiddleware,
 ]
