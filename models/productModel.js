@@ -43,14 +43,14 @@ const productSchema = new mongoose.Schema(
             trim: true,
             max: [20000000, "Too long product price"],
         },
-        Discount:{
-            type:Number,
+        Discount: {
+            type: Number,
             default: 0,
-       }, 
-       fixed:{
-        type:Number,
-        default:0,
-       },
+        },
+        fixed: {
+            type: Number,
+            default: 0,
+        },
         priceAfterDiscount: {
             type: Number,
         },
@@ -103,7 +103,7 @@ productSchema.virtual("reviews", {
 productSchema.pre(/^find/, function (next) {
     this.populate({
         path: "category brand createdBy",
-        select: "name -_id",
+        select: "name _id",
     })
     next()
 })
