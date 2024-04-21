@@ -135,9 +135,9 @@ exports.allowedTo = (...roles) =>
 // @access  Public
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
     // 1) Get user by email
-    const user = await User.findOne({ email: req.body.email })
+    const user = await User.findOne({ phone: req.body.phone })
     if (!user) {
-        return next(new ApiError(`${req.__("noUserwithEmail")} ${req.body.email}`, 404))
+        return next(new ApiError(`${req.__("noUserwithEmail")} ${req.body.phone}`, 404))
     }
     // 2) If user exist, Generate hash reset random 6 digits and save it in db
     const resetCode = Math.floor(1000 + Math.random() * 9000).toString()
@@ -153,7 +153,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
     // 3) Send the reset code via email
 
-    const message = `${req.__("hi")} ${user.name},\n ${req.__("forgotSms")} \n ${"resetCode"} \n ${req.__("forgotSms2")}`
+    const message = `${req.__("hi")} ${user.name},\n ${req.__("forgotSms")} \n ${resetCode} \n ${req.__("forgotSms2")}`
     try {
         await sendSms(user.phone, message, next)
     } catch (err) {
@@ -197,9 +197,9 @@ exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.resetPassword = asyncHandler(async (req, res, next) => {
     // 1) Get user based on email
-    const user = await User.findOne({ email: req.body.email })
+    const user = await User.findOne({ phone: req.body.phone })
     if (!user) {
-        return next(new ApiError(`${req.__("noUserwithEmail")} ${req.body.email}`, 404))
+        return next(new ApiError(`${req.__("noUserwithEmail")} ${req.body.phone}`, 404))
     }
 
     // 2) Check if reset code verified
@@ -269,7 +269,8 @@ exports.resendVerifyCode = asyncHandler(async (req, res, next) => {
     user.verifyCodeExpires = verifyCodeExpires
 
     await user.save()
-    const smsResponse = await sendSms(user.phone, `${req.__("smsFirst")} ${user.verifyCode} ${req.__("smsLast")}`, next)
+    const message = `${req.__("smsFirst")} ${user.verifyCode} ${req.__("smsLast")}`
+    const smsResponse = await sendSms(user.phone, message, next)
 
     res.status(200).json({
         status: "Success",

@@ -46,19 +46,24 @@ exports.getReport = factory.getOne(Report, "offers")
 // @access  Private/Admin
 exports.createReport = asyncHandler(async (req, res, next) => {
     req.body.createdBy = req.user._id
-    if (req.body.selectWorkshop === false || (req.body.selectWorkshop === true && req.body.allowedWorkshop.length === 0)) {
+    if (
+        req.body.selectWorkshop === "false" ||
+        req.body.selectWorkshop === false ||
+        ((req.body.selectWorkshop === "true" || req.body.selectWorkshop === true) && req.body.allowedWorkshop.length === 0)
+    ) {
         req.body.allowedWorkshop = []
         req.body.selectWorkshop = false
     }
     const document = await Report.create(req.body)
     let sentWorkshop = 0
-    if (req.body.selectWorkshop === true && req.body.allowedWorkshop.length != 0) {
+    if ((req.body.selectWorkshop === true || req.body.selectWorkshop === "true") && req.body.allowedWorkshop.length > 0) {
         let allowedWorkshop = req.body.allowedWorkshop
-
         allowedWorkshop.forEach(async (workshop) => {
             let user = await User.findById(workshop)
-            sendSms(user.phone, `You have a new report to post an offer on it.`, next)
-            sentWorkshop++
+            if (user.role === "workshop") {
+                sendSms(user.phone, `You have a new report to post an offer on it.`, next)
+                sentWorkshop++
+            }
         })
     } else {
         let workshop = await User.find({ role: "workshop" })

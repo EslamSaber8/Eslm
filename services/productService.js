@@ -56,7 +56,7 @@ exports.netAndSales = asyncHandler(async (req, res) => {
     })
 })
 
-exports.updateProducts = asyncHandler(async (req, res) => {
+exports.updateProducts = asyncHandler(async (req, res, next) => {
     const { products, Discount, fixed } = req.body
     if (Discount && fixed) {
         return next(new ApiError(`You can't set both fixed and percentage discount`, 400))
@@ -67,17 +67,18 @@ exports.updateProducts = asyncHandler(async (req, res) => {
     }
 
     products.forEach(async (product) => {
-        const update = await Product.findById(product._id).populate("createdBy")
-        if (update.createdBy.id !== req.user.id) {
-            if (Discount) {
-                update.Discount = Discount
-                update.priceAfterDiscount = product.price - (product.price * Discount) / 100
-            } else if (fixed) {
-                update.Discount = fixed
-                update.priceAfterDiscount = product.price - fixed
-            }
-            await update.save()
-        }
+        const update = await Product.findById(product)
+        console.log(update)
+        // if (update.createdBy === req.user.id) {
+        //     if (Discount) {
+        //         update.Discount = Discount
+        //         update.priceAfterDiscount = product.price - (product.price * Discount) / 100
+        //     } else if (fixed) {
+        //         update.Discount = fixed
+        //         update.priceAfterDiscount = product.price - fixed
+        //     }
+        //     await update.save()
+        // }
     })
     res.status(200).json({
         status: "success",
@@ -92,12 +93,9 @@ exports.getAllOffers = asyncHandler(async (req, res) => {
         filter = { Discount: { $gt: 0 } } // Filter products with discount greater than 0
     } else if (type === "fixed") {
         filter = { fixed: { $gt: 0 } } // Filter products with fixed price greater than 0
-    } else if (type === "either") {
+    } else {
         filter = {
-            $or: [
-                { Discount: { $gt: 0 } }, // Products with discount greater than 0
-                { fixed: { $gt: 0 } }, // Products with fixed price greater than 0
-            ],
+            $or: [{ Discount: { $gt: 0 } }, { fixed: { $gt: 0 } }],
             $and: [
                 { createdBy: req.user.id }, // Products created by the user
             ],
