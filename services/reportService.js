@@ -11,27 +11,6 @@ const offer = require("../models/OfferModel")
 const { sendSms } = require("../utils/sendSms")
 const User = require("../models/userModel")
 
-// Upload single image
-// exports.uploadUserImage = uploadMixOfImages("images")
-
-// Image processing
-// exports.resizeImage = asyncHandler(async (req, res, next) => {
-//   // const filename = `user-${uuidv4()}-${Date.now()}.jpeg`;
-
-//   if (req.file) {
-//     await sharp(req.file.buffer)
-//       .resize(600, 600)
-//       .toFormat('jpeg')
-//       .jpeg({ quality: 95 })
-//       .toFile(`uploads/users/${filename}`);
-
-//     // Save image into our db
-//     req.body.images = filename;
-//   }
-
-//   next();
-// });
-
 // @desc    Get list of  reports
 // @route   GET /api/v1/ reports
 // @access  Private/Admin

@@ -47,6 +47,8 @@ const userSchema = new mongoose.Schema(
         passwordResetCode: String,
         passwordResetExpires: Date,
         passwordResetVerified: Boolean,
+        workshopLocationLat: String,
+        workshopLocationLong: String,
         role: {
             type: String,
             enum: ["workshop", "driver", "insurance", "vendor", "admin", "superAdmin"],
