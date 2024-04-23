@@ -42,5 +42,6 @@
 	"emailAlreadyVerified": "Email is already verified",
 	"emailVerified": "Email is verified",
 	"verifySend": "Verification code sent to your email",
-	"Invalid value": "Invalid value"
+	"Invalid value": "Invalid value",
+	"Invalid report id format": "Invalid report id format"
 }
