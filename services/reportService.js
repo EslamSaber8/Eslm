@@ -66,7 +66,7 @@ exports.createReport = asyncHandler(async (req, res, next) => {
             }
         })
     } else {
-        let workshop = await User.find({ role: "workshop" })
+        let workshop = await User.find({ role: "workshop", verified: true })
         // console.log(workshop);
         if (workshop) {
             workshop.forEach(async (workshop) => {
@@ -142,9 +142,6 @@ exports.getReportsForWorkshops = asyncHandler(async (req, res, next) => {
 
 exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
     const report = await Report.findById(req.params.id)
-    if(report.createdBy.toString() !== req.user._id.toString()){
-        return next(new ApiError(`You are not allowed to perform this action`, 403))
-    }
     if (!report) {
         return next(new ApiError(`No document for this id ${req.params.id}`, 404))
     }
@@ -155,7 +152,7 @@ exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
         report.progress = "driveroffers"
         report.selectedWorkshopOffer = req.body.workshopId
         await report.save()
-        let user = await User.find({ role: "driver" })
+        let user = await User.find({ role: "driver", verified: true })
         user.forEach(async (user) => {
             sendSms(user.phone, `You have a new report to post an offer on it.`, next)
         })
@@ -167,9 +164,6 @@ exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
 
 exports.acceptDriverOffer = asyncHandler(async (req, res, next) => {
     const report = await Report.findById(req.params.id)
-    if(report.createdBy.toString() !== req.user._id.toString()){
-        return next(new ApiError(`You are not allowed to perform this action`, 403))
-    }
     if (!report) {
         return next(new ApiError(`No document for this id ${req.params.id}`, 404))
     }

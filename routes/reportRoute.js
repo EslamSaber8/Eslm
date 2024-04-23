@@ -14,8 +14,8 @@ router
     .delete(authService.allowedTo("admin", "superAdmin", "insurance"),deleteReportValidator, deleteReport)
 
 router.route("/").get(getReports).post(authService.allowedTo("admin", "superAdmin", "insurance"),uploadMultipleImages, createReportValidator, createReport)
-router.route("/workshop/:id").post(authService.allowedTo("insurance"), acceptWorkshopOffer)
-router.route("/driver/:id").post(authService.allowedTo("insurance"), acceptDriverOffer)
+router.route("/workshop/:id").post(authService.allowedTo("admin", "superAdmin","insurance"), acceptWorkshopOffer)
+router.route("/driver/:id").post(authService.allowedTo("admin", "superAdmin","insurance"), acceptDriverOffer)
 
 
 module.exports = router

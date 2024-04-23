@@ -20,7 +20,8 @@ exports.getOffer = factory.getOne(Offer)
 // exports.createOffer = factory.createOne(Offer)
 exports.createOffer = asyncHandler(async (req, res, next) => {
     const user = req.user
-    const report = Report.findById(req.body.report)
+    const id = req.body.report
+    const report = await Report.findById(id).populate("offers")
     if ((user.role === "workshop" && report.progress != "workshopoffers") || (user.role === "driver" && report.progress != "driveroffers")) {
         return next(new ApiError("You are not allowed to create an offer for this report", 403))
     } else if (report.selectWorkshop && user.role === "workshop" && !report.allowedWorkshop.includes(user._id)) {
