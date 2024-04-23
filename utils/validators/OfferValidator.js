@@ -33,6 +33,39 @@ exports.createOfferValidator = [
     
     validatorMiddleware,
 ]
+
+exports.createDriverOfferValidator = [
+    body("price").isNumeric().notEmpty().withMessage("price is required"),
+    body("deadline")
+        .toDate()
+        .notEmpty()
+        .withMessage("Date is required"),
+    check("report")
+        .isMongoId()
+        .withMessage("Invalid report id format")
+        .custom((val, { req }) =>
+            // Check if logged user create offer before
+            Offer.findOne({ createdBy: req.user._id, report: req.body.report }).then((offer) => {
+                if (offer) {
+                    return Promise.reject(new Error("You already created a offer before"))
+                }
+            })
+        ),
+    
+    validatorMiddleware,
+]
+
+
+
+
+
+
+
+
+
+
+
+
 exports.updateOfferValidator = [
     body("price").optional().isNumeric().withMessage("Price must be a number"),
     body("deadline").optional().isISO8601().toDate().withMessage("Deadline must be a valid date"),

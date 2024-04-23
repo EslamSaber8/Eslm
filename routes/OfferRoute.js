@@ -7,9 +7,10 @@ getOffer,
 createOffer,
 updateOffer,
 deleteOffer,} = require('../services/OfferService');
-const {getOfferValidator ,createOfferValidator,updateOfferValidator,deleteOfferValidator }= require('../utils/validators/OfferValidator');
+const {getOfferValidator ,createOfferValidator,createDriverOfferValidator,updateOfferValidator,deleteOfferValidator }= require('../utils/validators/OfferValidator');
 router.use(authService.protect); 
 // router.use(authService.allowedTo('admin', 'superAdmin'));
+router.route('/driver').post(authService.allowedTo('driver'),createDriverOfferValidator, createOffer);
 router
   .route('/')
   .get(authService.allowedTo('admin', 'superAdmin',"insurance"), getOffers)

@@ -8,7 +8,7 @@ const OfferSchema = new mongoose.Schema(
         partPrice: Number,
         description: {
             type: String,
-            required: [true, "Product description is required"],
+            // required: [true, "Product description is required"],
             minlength: [10, "Too short product description"],
         },
         createdBy: {
