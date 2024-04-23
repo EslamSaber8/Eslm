@@ -7,7 +7,7 @@ const ApiError = require("../utils/apiError")
 // const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware")
 const createToken = require("../utils/createToken")
 const Report = require("../models/reportModel")
-const offer=require("../models/OfferModel")
+const offer = require("../models/OfferModel")
 const { sendSms } = require("../utils/sendSms")
 const User = require("../models/userModel")
 
@@ -111,22 +111,22 @@ exports.updateReport = asyncHandler(async (req, res, next) => {
 // @desc    Delete specific user
 // @route   DELETE /api/v1/users/:id
 // @access  Private/Admin
-exports.deleteReport =
-    asyncHandler(async (req, res, next) => {
-        const { id } = req.params
-        const document = await  Report.findByIdAndDelete(id)
+exports.deleteReport = asyncHandler(async (req, res, next) => {
+    const { id } = req.params
+    const document = await Report.findByIdAndDelete(id)
 
-        if (!document) {
-            return next(new ApiError(`No document for this id ${id}`, 404))
-        }
-        if(  document.offers.length>0){
-     document.offers.forEach(el=>{
-        offer.findByIdAndDelete(el);
- })}
-        // Trigger "remove" event when update document
-        document.remove()
-        res.status(204).send()
-    })
+    if (!document) {
+        return next(new ApiError(`No document for this id ${id}`, 404))
+    }
+    if (document.offers.length > 0) {
+        document.offers.forEach((el) => {
+            offer.findByIdAndDelete(el)
+        })
+    }
+    // Trigger "remove" event when update document
+    document.remove()
+    res.status(204).send()
+})
 
 exports.getReportsForWorkshops = asyncHandler(async (req, res, next) => {
     const user = req.user.id
@@ -168,6 +168,8 @@ exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
         report.progress = "driveroffers"
         report.selectedWorkshopOffer = req.body.workshopId
         await report.save()
+        let workshop = await User.findById(req.body.workshopId)
+        sendSms(workshop.phone, `Your offer has been accepted.`, next)
         let user = await User.find({ role: "driver", verified: true })
         user.forEach(async (user) => {
             sendSms(user.phone, `You have a new report to post an offer on it.`, next)
@@ -190,6 +192,8 @@ exports.acceptDriverOffer = asyncHandler(async (req, res, next) => {
         report.progress = "driverinprogress"
         report.selectedDriverOffer = req.body.driverId
         await report.save()
+        let driver = await User.findById(req.body.driverId)
+        sendSms(driver.phone, `Your offer has been accepted.`, next)
 
         res.status(200).json({ data: report })
     } else {
