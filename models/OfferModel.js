@@ -8,9 +8,8 @@ const OfferSchema = new mongoose.Schema({
     description: {
         type: String,
         required: [true, 'Product description is required'],
-        minlength: [20, 'Too short product description'],
+        minlength: [10, 'Too short product description'],
       },
-
     createdBy: {
         type: mongoose.Schema.ObjectId,
         ref: "User",

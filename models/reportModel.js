@@ -12,7 +12,7 @@ const reportSchema = new mongoose.Schema(
         reportDescription: String,
         partsList: [String], // Optional, array of parts
         locationOfVehicle: String,
-
+        haveParts: Boolean, //true if user have parts
         reportStatus: {
             type: String,
             enum: ["pending", "completed", "cancelled"],
@@ -23,6 +23,14 @@ const reportSchema = new mongoose.Schema(
             enum: ["workshopoffers", "driveroffers", "workshopinprogress", "workshopcompleted", "driverinprogress", "drivercompleted"],
             default: "workshopoffers",
         },
+        selectedWorkshopOffer: {
+            type: mongoose.Schema.ObjectId,
+            ref: "User",
+        },
+        selectedDriverOffer: {
+            type: mongoose.Schema.ObjectId,
+            ref: "User",
+        },
         selectWorkshop: Boolean,
         allowedWorkshop: [
             {
@@ -30,14 +38,11 @@ const reportSchema = new mongoose.Schema(
                 ref: "User",
             },
         ],
-
         createdBy: {
             type: mongoose.Schema.ObjectId,
             ref: "User",
         },
         uploadFiles: String, // Optional, array of file paths
-
-        
         selectedWorkshopOffer: {
             type: mongoose.Schema.ObjectId,
             ref: "Offer",
