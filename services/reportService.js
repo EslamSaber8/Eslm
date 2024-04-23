@@ -152,6 +152,8 @@ exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
         report.progress = "driveroffers"
         report.selectedWorkshopOffer = req.body.workshopId
         await report.save()
+        let workshop = await User.findById(req.body.workshopId)
+        sendSms(workshop.phone, `Your offer has been accepted.`, next)
         let user = await User.find({ role: "driver", verified: true })
         user.forEach(async (user) => {
             sendSms(user.phone, `You have a new report to post an offer on it.`, next)
@@ -174,6 +176,8 @@ exports.acceptDriverOffer = asyncHandler(async (req, res, next) => {
         report.progress = "driverinprogress"
         report.selectedDriverOffer = req.body.driverId
         await report.save()
+        let driver = await User.findById(req.body.driverId)
+        sendSms(driver.phone, `Your offer has been accepted.`, next)
 
         res.status(200).json({ data: report })
     } else {
