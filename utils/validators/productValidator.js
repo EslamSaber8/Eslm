@@ -144,6 +144,18 @@ exports.updateProductValidator = [
             req.body.priceAfterDiscount = product.price - (product.price * req.body.Discount) / 100
             return true
         }),
+        check("fixed")
+        .optional()
+        .isNumeric()
+        .withMessage("fixed price must be a number")
+        .custom(async(value, { req }) => {
+            if (req.body.price <= value) {
+                throw new Error("fixed Price must be lower than price")
+            }
+            const product = await productModel.findById(req.params.id)
+            req.body.priceAfterDiscount = product.price- req.body.fixed
+            return true
+        }),
 
     body("title")
         .optional()
