@@ -12,7 +12,7 @@ router.use(authService.protect);
 // router.use(authService.allowedTo('admin', 'superAdmin'));
 router
   .route('/')
-  .get(authService.allowedTo('admin', 'superAdmin'), getOffers)
+  .get(authService.allowedTo('admin', 'superAdmin',"insurance"), getOffers)
   .post(authService.allowedTo('driver','workshop',"vendor"),createOfferValidator, createOffer);
 router
   .route('/:id')

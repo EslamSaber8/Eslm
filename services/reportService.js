@@ -66,7 +66,7 @@ exports.createReport = asyncHandler(async (req, res, next) => {
             }
         })
     } else {
-        let workshop = await User.find({ role: "workshop" })
+        let workshop = await User.find({ role: "workshop", verified: true })
         // console.log(workshop);
         if (workshop) {
             workshop.forEach(async (workshop) => {
@@ -111,3 +111,72 @@ exports.updateReport = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/users/:id
 // @access  Private/Admin
 exports.deleteReport = factory.deleteOne(Report)
+
+exports.getReportsForWorkshops = asyncHandler(async (req, res, next) => {
+    const user = req.user.id
+    const page = req.query.page * 1 || 1
+    const limit = req.query.limit * 1 || 20
+    const skip = (page - 1) * limit
+    const query = req.query.reportStatus || "pending"
+    //limit 20 reports
+    const reports = await Report.find()
+        .where({
+            $or: [{ selectWorkshop: true, allowedWorkshop: { $in: [user] } }, { selectWorkshop: false }],
+            reportStatus: query,
+        })
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+
+    // console.log(reports);
+
+    res.status(200).json({
+        status: "success",
+        results: reports.length,
+        currentPage: page,
+        limit,
+        // numberOfPages: Math.ceil(reports.length / limit),
+        data: reports,
+    })
+})
+
+exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
+    const report = await Report.findById(req.params.id)
+    if (!report) {
+        return next(new ApiError(`No document for this id ${req.params.id}`, 404))
+    }
+    if (report.selectedWorkshopOffer) {
+        return next(new ApiError(`You already accepted an offer`, 400))
+    }
+    if (report.progress === "workshopoffers") {
+        report.progress = "driveroffers"
+        report.selectedWorkshopOffer = req.body.workshopId
+        await report.save()
+        let user = await User.find({ role: "driver", verified: true })
+        user.forEach(async (user) => {
+            sendSms(user.phone, `You have a new report to post an offer on it.`, next)
+        })
+        res.status(200).json({ data: report })
+    } else {
+        return next(new ApiError(`You are not allowed to perform this action`, 403))
+    }
+})
+
+exports.acceptDriverOffer = asyncHandler(async (req, res, next) => {
+    const report = await Report.findById(req.params.id)
+    if (!report) {
+        return next(new ApiError(`No document for this id ${req.params.id}`, 404))
+    }
+    if (report.selectedDriverOffer) {
+        return next(new ApiError(`You already accepted an offer`, 400))
+    }
+    if (report.progress === "driveroffers") {
+        report.progress = "driverinprogress"
+        report.selectedDriverOffer = req.body.driverId
+        await report.save()
+
+        res.status(200).json({ data: report })
+    } else {
+        return next(new ApiError(`You are not allowed to perform this action`, 403))
+    }
+})
