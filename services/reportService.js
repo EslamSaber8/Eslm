@@ -20,7 +20,7 @@ exports.getReports = factory.getAll(Report)
 // @desc    Get specific report by id
 // @route   GET /api/v1/ reports/:id
 // @access  Private/Admin
-exports.getReport = factory.getOne(Report, "offers")
+exports.getReport = factory.getOne(Report, "offers selectedWorkshopOffer")
 
 // @desc    Create report
 // @route   POST  /api/v1/users

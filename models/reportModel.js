@@ -59,6 +59,11 @@ reportSchema.virtual("offers", {
     foreignField: "report",
 })
 
+// reportSchema.populate("selectedWorkshopOffer")
+
+
+
+
 // Create and export the model
 const Report = mongoose.model("Report", reportSchema)
 
