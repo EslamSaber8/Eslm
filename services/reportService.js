@@ -98,7 +98,7 @@ exports.deleteReport = asyncHandler(async (req, res, next) => {
     if (!document) {
         return next(new ApiError(`No document for this id ${id}`, 404))
     }
-    Offer.deleteMany({ report: id })
+    await Offer.deleteMany({ report: id })
 
     // Trigger "remove" event when update document
     document.remove()
