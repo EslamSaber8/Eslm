@@ -142,6 +142,9 @@ exports.getReportsForWorkshops = asyncHandler(async (req, res, next) => {
 
 exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
     const report = await Report.findById(req.params.id)
+    if(report.createdBy.toString() !== req.user._id.toString()){
+        return next(new ApiError(`You are not allowed to perform this action`, 403))
+    }
     if (!report) {
         return next(new ApiError(`No document for this id ${req.params.id}`, 404))
     }
@@ -164,6 +167,9 @@ exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
 
 exports.acceptDriverOffer = asyncHandler(async (req, res, next) => {
     const report = await Report.findById(req.params.id)
+    if(report.createdBy.toString() !== req.user._id.toString()){
+        return next(new ApiError(`You are not allowed to perform this action`, 403))
+    }
     if (!report) {
         return next(new ApiError(`No document for this id ${req.params.id}`, 404))
     }
