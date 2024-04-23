@@ -10,6 +10,7 @@ const Report = require("../models/reportModel")
 const offer = require("../models/OfferModel")
 const { sendSms } = require("../utils/sendSms")
 const User = require("../models/userModel")
+const Offer = require("../models/OfferModel")
 
 // @desc    Get list of  reports
 // @route   GET /api/v1/ reports
@@ -97,11 +98,8 @@ exports.deleteReport = asyncHandler(async (req, res, next) => {
     if (!document) {
         return next(new ApiError(`No document for this id ${id}`, 404))
     }
-    if (document.offers.length > 0) {
-        document.offers.forEach((el) => {
-            offer.findByIdAndDelete(el)
-        })
-    }
+    Offer.deleteMany({ report: id })
+
     // Trigger "remove" event when update document
     document.remove()
     res.status(204).send()
