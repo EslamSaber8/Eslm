@@ -67,7 +67,7 @@ exports.createReport = asyncHandler(async (req, res, next) => {
             }
         })
     } else {
-        let workshop = await User.find({ role: "workshop" })
+        let workshop = await User.find({ role: "workshop", verified: true })
         // console.log(workshop);
         if (workshop) {
             workshop.forEach(async (workshop) => {
