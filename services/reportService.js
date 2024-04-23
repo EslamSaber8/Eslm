@@ -7,6 +7,7 @@ const ApiError = require("../utils/apiError")
 // const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware")
 const createToken = require("../utils/createToken")
 const Report = require("../models/reportModel")
+const offer=require("../models/OfferModel")
 const { sendSms } = require("../utils/sendSms")
 const User = require("../models/userModel")
 
@@ -107,7 +108,23 @@ exports.updateReport = asyncHandler(async (req, res, next) => {
     res.status(200).json({ data: document })
 })
 
-// @desc    Delete specific user
-// @route   DELETE /api/v1/users/:id
-// @access  Private/Admin
+
 exports.deleteReport = factory.deleteOne(Report)
+
+
+exports.deleteOne = ( Report) =>
+    asyncHandler(async (req, res, next) => {
+        const { id } = req.params
+        const document = await  Report.findByIdAndDelete(id)
+
+        if (!document) {
+            return next(new ApiError(`No document for this id ${id}`, 404))
+        }
+        if(  document.offers.length>0){
+     document.offers.forEach(el=>{
+        offer.findByIdAndDelete(el);
+ })}
+        // Trigger "remove" event when update document
+        document.remove()
+        res.status(204).send()
+    })
