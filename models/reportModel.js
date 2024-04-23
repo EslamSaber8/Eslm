@@ -43,14 +43,6 @@ const reportSchema = new mongoose.Schema(
             ref: "User",
         },
         uploadFiles: String, // Optional, array of file paths
-        selectedWorkshopOffer: {
-            type: mongoose.Schema.ObjectId,
-            ref: "Offer",
-        },
-        selectedDriverOffer: {
-            type: mongoose.Schema.ObjectId,
-            ref: "Offer",
-        },
     },
     {
         timestamps: true,

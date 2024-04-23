@@ -29,6 +29,8 @@ exports.signupAs = asyncHandler(async (req, res, next) => {
         role: req.params.role,
         license: req.body.license,
         idImg: req.body.idImg,
+        workshopLocationLat: req.body.workshopLocationLat,
+        workshopLocationLong: req.body.workshopLocationLong,
         verifyCode,
         verifyCodeExpires,
         password: req.body.password,
@@ -41,7 +43,7 @@ exports.signupAs = asyncHandler(async (req, res, next) => {
     const token = createToken(user._id)
 
     // 3- Send verify code via sms
-    const smsResponse = await sendSms(user.phone, `${req.__("smsFirst")} ${user.verifyCode} ${req.__("smsLast")}`, next)
+    await sendSms(user.phone, `${req.__("smsFirst")} ${user.verifyCode} ${req.__("smsLast")}`, next)
 
     return res.status(201).json({ data: user, token })
 })
