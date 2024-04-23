@@ -108,7 +108,7 @@ exports.updateReport = asyncHandler(async (req, res, next) => {
     res.status(200).json({ data: document })
 })
 
-exports.deleteReport = ( Report) =>
+exports.deleteReport =
     asyncHandler(async (req, res, next) => {
         const { id } = req.params
         const document = await  Report.findByIdAndDelete(id)
