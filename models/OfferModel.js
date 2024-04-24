@@ -6,6 +6,11 @@ const OfferSchema = new mongoose.Schema(
         price: Number,
         deadline: Date,
         partPrice: Number,
+        type:{
+            type: String,
+            enum: ["workshop", "driver","vendor"],
+            default: "workshop",
+        },
         description: {
             type: String,
             // required: [true, "Product description is required"],

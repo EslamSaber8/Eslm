@@ -15,7 +15,7 @@ const reportSchema = new mongoose.Schema(
         haveParts: Boolean, //true if user have parts
         reportStatus: {
             type: String,
-            enum: ["pending", "completed", "cancelled"],
+            enum: ["pending", "completed","progress", "cancelled"],
             default: "pending",
         },
         progress: {
