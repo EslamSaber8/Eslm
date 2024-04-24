@@ -28,6 +28,7 @@ exports.createOffer = asyncHandler(async (req, res, next) => {
         return next(new ApiError("You are not allowed to create an offer for this report", 403))
     }
     req.body.createdBy = req.user._id
+    req.body.type = req.user.role
     const document = await Offer.create(req.body)
 
     res.status(201).json({ data: document })

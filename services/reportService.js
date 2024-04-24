@@ -20,7 +20,7 @@ exports.getReports = factory.getAll(Report)
 // @desc    Get specific report by id
 // @route   GET /api/v1/ reports/:id
 // @access  Private/Admin
-exports.getReport = factory.getOne(Report, "offers")
+exports.getReport = factory.getOne(Report, "offers selectedWorkshopOffer")
 
 // @desc    Create report
 // @route   POST  /api/v1/users
@@ -111,11 +111,13 @@ exports.getReportsForWorkshops = asyncHandler(async (req, res, next) => {
     const limit = req.query.limit * 1 || 20
     const skip = (page - 1) * limit
     const query = req.query.reportStatus || "pending"
+    const progress = req.query.progress || "workshopoffers"
     //limit 20 reports
     const reports = await Report.find()
         .where({
             $or: [{ selectWorkshop: true, allowedWorkshop: { $in: [user] } }, { selectWorkshop: false }],
             reportStatus: query,
+            progress,
         })
         .skip(skip)
         .limit(limit)
@@ -144,6 +146,7 @@ exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
     if (report.progress === "workshopoffers") {
         report.progress = "driveroffers"
         report.selectedWorkshopOffer = req.body.workshopId
+        report.reportStatus = "progress"
         await report.save()
         let workshop = await User.findById(req.body.workshopId)
         sendSms(workshop.phone, `Your offer has been accepted.`, next)
@@ -171,6 +174,59 @@ exports.acceptDriverOffer = asyncHandler(async (req, res, next) => {
         await report.save()
         let driver = await User.findById(req.body.driverId)
         sendSms(driver.phone, `Your offer has been accepted.`, next)
+
+        res.status(200).json({ data: report })
+    } else {
+        return next(new ApiError(`You are not allowed to perform this action`, 403))
+    }
+})
+
+exports.driverFinishDelivery = asyncHandler(async (req, res, next) => {
+    const report = await Report.findById(req.params.id)
+    if (!report) {
+        return next(new ApiError(`No document for this id ${req.params.id}`, 404))
+    }
+    if (report.progress === "driverinprogress") {
+        report.progress = "drivercompleted"
+        await report.save()
+        let workshop = await User.findById(report.selectedWorkshopOffer)
+        sendSms(workshop.phone, `The driver has finished the delivery.`, next)
+
+        res.status(200).json({ data: report })
+    } else {
+        return next(new ApiError(`You are not allowed to perform this action`, 403))
+    }
+})
+
+exports.workshopFinishFixing = asyncHandler(async (req, res, next) => {
+    const report = await Report.findById(req.params.id)
+    if (!report) {
+        return next(new ApiError(`No document for this id ${req.params.id}`, 404))
+    }
+    if (report.progress === "workshopinprogress") {
+        report.progress = "workshopcompleted"
+        // report.reportStatus = "completed"
+        await report.save()
+        let selectInsuranceCompany = await User.findById(report.createdBy)
+        sendSms(selectInsuranceCompany.phone, `The workshop has finished the fixing, check it out.`, next)
+
+        res.status(200).json({ data: report })
+    } else {
+        return next(new ApiError(`You are not allowed to perform this action`, 403))
+    }
+})
+
+
+exports.completeReport = asyncHandler(async (req, res, next) => {
+    const report = await Report.findById(req.params.id)
+    if (!report) {
+        return next(new ApiError(`No document for this id ${req.params.id}`, 404))
+    }
+    if (report.progress === "workshopcompleted") {
+        report.reportStatus = "completed"
+        await report.save()
+        let user = await User.findById(report.createdBy)
+        sendSms(user.phone, `The workshop has finished the fixing, check it out.`, next)
 
         res.status(200).json({ data: report })
     } else {
