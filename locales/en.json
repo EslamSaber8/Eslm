@@ -43,5 +43,7 @@
 	"emailVerified": "Email is verified",
 	"verifySend": "Verification code sent to your email",
 	"Invalid value": "Invalid value",
-	"Invalid report id format": "Invalid report id format"
+	"Invalid report id format": "Invalid report id format",
+	"You must enter your current password": "You must enter your current password",
+	"user is not defined": "user is not defined"
 }
