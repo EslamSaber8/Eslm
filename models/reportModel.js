@@ -20,7 +20,7 @@ const reportSchema = new mongoose.Schema(
         },
         progress: {
             type: String,
-            enum: ["workshopoffers", "driveroffers", "workshopinprogress", "workshopcompleted", "driverinprogress", "drivercompleted"],
+            enum: ["workshopoffers", "driveroffers", "workshopinprogress", "workshopcompleted", "driverinprogress"],
             default: "workshopoffers",
         },
         selectedWorkshopOffer: {
