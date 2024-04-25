@@ -19,7 +19,7 @@ exports.getTopFive = expressAsyncHandler(async (req, res, next) => {
 
     const workshopMembers = await User.find({ role: "workshop" }).countDocuments()
     const driverMembers = await User.find({ role: "driver" }).countDocuments()
-    const insuranceMembers = await User.find({ role: "insurance" }).countDocuments()
+    const vevdorMembers = await User.find({ role: "vendor" }).countDocuments()
 
     return res.status(200).json({
         data: {
@@ -28,7 +28,7 @@ exports.getTopFive = expressAsyncHandler(async (req, res, next) => {
             topFiveInsuranceCompany: finalInsuranceCompany,
             workshopMembers,
             driverMembers,
-            insuranceMembers,
+            vevdorMembers,
         },
     })
 })
