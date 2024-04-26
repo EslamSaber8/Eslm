@@ -22,6 +22,14 @@ exports.createOffer = asyncHandler(async (req, res, next) => {
     const user = req.user
     const id = req.body.report
     const report = await Report.findById(id).populate("offers")
+    if (user.role === "vendor" && !report.isPartAvailable && !report.isWorkshopHaveParts) {
+        req.body.createdBy = req.user._id
+        req.body.type = req.user.role
+        const document = await Offer.create(req.body)
+        return res.status(201).json({ data: document })
+    } else if (user.role === "vendor" && (report.isPartAvailable || report.isWorkshopHaveParts)) {
+        return next(new ApiError("You are not allowed to create an offer for this report", 403))
+    }
     if ((user.role === "workshop" && report.progress != "workshopoffers") || (user.role === "driver" && report.progress != "driveroffers")) {
         return next(new ApiError("You are not allowed to create an offer for this report", 403))
     } else if (report.selectWorkshop && user.role === "workshop" && !report.allowedWorkshop.includes(user._id)) {

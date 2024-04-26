@@ -7,24 +7,27 @@ exports.getTopFive = expressAsyncHandler(async (req, res, next) => {
     const topFiveWorkshops = await getTopFives("workshop")
     const topFiveDriver = await getTopFives("driver")
     const topFiveInsuranceCompany = await getTopFives("insurance")
-    const finalWorkshop = topFiveWorkshops.map((workshop) => {
+    let finalWorkshop = topFiveWorkshops.map((workshop) => {
         if (workshop.user) {
             return workshop.user
         }
         return
     })
-    const finalDriver = topFiveDriver.map((driver) => {
+    let finalDriver = topFiveDriver.map((driver) => {
         if (driver.user) {
             return driver.user
         }
         return
     })
-    const finalInsuranceCompany = topFiveInsuranceCompany.map((insurance) => {
+    let finalInsuranceCompany = topFiveInsuranceCompany.map((insurance) => {
         if (insurance.user) {
             return insurance.user
         }
         return
     })
+    finalWorkshop = finalWorkshop.filter((workshop) => workshop !== undefined)
+    finalDriver = finalDriver.filter((driver) => driver !== undefined)
+    finalInsuranceCompany = finalInsuranceCompany.filter((insurance) => insurance !== undefined)
 
     const workshopMembers = await User.find({ role: "workshop" }).countDocuments()
     const driverMembers = await User.find({ role: "driver" }).countDocuments()
