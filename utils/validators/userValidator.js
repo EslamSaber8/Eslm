@@ -113,11 +113,6 @@ exports.changeUserPasswordValidator = [
 
 exports.deleteUserValidator = [check("id").isMongoId().withMessage("Invalid User id format"), validatorMiddleware]
 
-
-
-
-
-
 exports.changeLoggedUserPasswordValidator = [
     body("password").notEmpty() .withMessage("You must enter new password"),
     body("currentPassword").notEmpty().withMessage("You must enter your current password") 
@@ -133,6 +128,7 @@ exports.changeLoggedUserPasswordValidator = [
     
     validatorMiddleware,
 ]
+
 exports.updateLoggedUserValidator = [
     body("name")
         .optional()

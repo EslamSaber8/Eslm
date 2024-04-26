@@ -11,7 +11,9 @@ const offer = require("../models/OfferModel")
 const { sendSms } = require("../utils/sendSms")
 const User = require("../models/userModel")
 const Offer = require("../models/OfferModel")
+const topFiveModel = require("../models/topFiveModel")
 
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 // @desc    Get list of  reports
 // @route   GET /api/v1/ reports
 // @access  Private/Admin
@@ -56,6 +58,14 @@ exports.createReport = asyncHandler(async (req, res, next) => {
             })
         }
     }
+    if (req.body.isPartAvailable === false || req.body.isPartAvailable === "false") {
+        let vendor = await User.find({ role: "vendor", verified: true })
+        if (vendor) {
+            vendor.forEach(async (vendor) => {
+                sendSms(vendor.phone, `You have a new report to post an offer on it.`, next)
+            })
+        }
+    }
     return res.status(201).json({ data: document, sentWorkshopNumber: sentWorkshop })
 })
 
@@ -71,6 +81,7 @@ exports.updateReport = asyncHandler(async (req, res, next) => {
             carModel: req.body.carModel,
             carNumber: req.body.carNumber,
             reportDescription: req.body.reportDescription,
+            isPartAvailable: req.body.isPartAvailable,
             partsList: req.body.partsList,
             locationOfVehicle: req.body.locationOfVehicle,
             selectWorkshop: req.body.selectWorkshop,
@@ -111,13 +122,18 @@ exports.getReportsForWorkshops = asyncHandler(async (req, res, next) => {
     const limit = req.query.limit * 1 || 20
     const skip = (page - 1) * limit
     const query = req.query.reportStatus || "pending"
-    const progress = req.query.progress || "workshopoffers"
+    // const progress = req.query.progress || "workshopoffers"
     //limit 20 reports
+    const reportCount = await Report.find()
+        .where({
+            $or: [{ selectWorkshop: true, allowedWorkshop: { $in: [user] } }, { selectWorkshop: false }],
+            reportStatus: query,
+        })
+        .countDocuments()
     const reports = await Report.find()
         .where({
             $or: [{ selectWorkshop: true, allowedWorkshop: { $in: [user] } }, { selectWorkshop: false }],
             reportStatus: query,
-            progress,
         })
         .skip(skip)
         .limit(limit)
@@ -130,9 +146,26 @@ exports.getReportsForWorkshops = asyncHandler(async (req, res, next) => {
         results: reports.length,
         currentPage: page,
         limit,
-        // numberOfPages: Math.ceil(reports.length / limit),
+        numberOfPages: Math.ceil(reportCount / limit),
         data: reports,
     })
+})
+exports.acceptVendorOffer = asyncHandler(async (req, res, next) => {
+    const report = await Report.findById(req.params.id)
+    if (!report) {
+        return next(new ApiError(`No document for this id ${req.params.id}`, 404))
+    }
+    if (report.selectedVendor) {
+        return next(new ApiError(`You already accepted an offer`, 400))
+    }
+    if (report.isWorkshopHaveParts) {
+        return next(new ApiError(`You already accepted parts from workshops`, 400))
+    }
+    report.selectedVendor = req.body.vendorId
+    await report.save()
+    let vendor = await User.findById(req.body.vendorId)
+    await sendSms(vendor.phone, `Your offer has been accepted.`, next)
+    res.status(200).json({ data: report })
 })
 
 exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
@@ -143,13 +176,19 @@ exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
     if (report.selectedWorkshopOffer) {
         return next(new ApiError(`You already accepted an offer`, 400))
     }
+    report.isWorkshopHaveParts = req.body.isWorkshopHaveParts
+
+    if (report.selectedVendor) {
+        report.isWorkshopHaveParts = false
+    }
+
     if (report.progress === "workshopoffers") {
         report.progress = "driveroffers"
         report.selectedWorkshopOffer = req.body.workshopId
         report.reportStatus = "progress"
         await report.save()
         let workshop = await User.findById(req.body.workshopId)
-        sendSms(workshop.phone, `Your offer has been accepted.`, next)
+        await sendSms(workshop.phone, `Your offer has been accepted.`, next)
         let user = await User.find({ role: "driver", verified: true })
         user.forEach(async (user) => {
             sendSms(user.phone, `You have a new report to post an offer on it.`, next)
@@ -173,7 +212,7 @@ exports.acceptDriverOffer = asyncHandler(async (req, res, next) => {
         report.selectedDriverOffer = req.body.driverId
         await report.save()
         let driver = await User.findById(req.body.driverId)
-        sendSms(driver.phone, `Your offer has been accepted.`, next)
+        await sendSms(driver.phone, `Your offer has been accepted.`, next)
 
         res.status(200).json({ data: report })
     } else {
@@ -187,10 +226,10 @@ exports.driverFinishDelivery = asyncHandler(async (req, res, next) => {
         return next(new ApiError(`No document for this id ${req.params.id}`, 404))
     }
     if (report.progress === "driverinprogress") {
-        report.progress = "drivercompleted"
+        report.progress = "workshopinprogress"
         await report.save()
         let workshop = await User.findById(report.selectedWorkshopOffer)
-        sendSms(workshop.phone, `The driver has finished the delivery.`, next)
+        await sendSms(workshop.phone, `The driver has finished the delivery.`, next)
 
         res.status(200).json({ data: report })
     } else {
@@ -208,7 +247,7 @@ exports.workshopFinishFixing = asyncHandler(async (req, res, next) => {
         // report.reportStatus = "completed"
         await report.save()
         let selectInsuranceCompany = await User.findById(report.createdBy)
-        sendSms(selectInsuranceCompany.phone, `The workshop has finished the fixing, check it out.`, next)
+        await sendSms(selectInsuranceCompany.phone, `The workshop has finished the fixing, check it out.`, next)
 
         res.status(200).json({ data: report })
     } else {
@@ -216,6 +255,22 @@ exports.workshopFinishFixing = asyncHandler(async (req, res, next) => {
     }
 })
 
+exports.vendorFinishDelivery = asyncHandler(async (req, res, next) => {
+    const report = await Report.findById(req.params.id)
+    if (!report) {
+        return next(new ApiError(`No document for this id ${req.params.id}`, 404))
+    }
+    if (report.selectedVendor) {
+        report.vendorStatus = "delivered"
+        await report.save()
+        let selectInsuranceCompany = await User.findById(report.createdBy)
+        await sendSms(selectInsuranceCompany.phone, `The vendor has finished the delivery, check it out.`, next)
+
+        res.status(200).json({ data: report })
+    } else {
+        return next(new ApiError(`You are not allowed to perform this action`, 403))
+    }
+})
 
 exports.completeReport = asyncHandler(async (req, res, next) => {
     const report = await Report.findById(req.params.id)
@@ -225,8 +280,71 @@ exports.completeReport = asyncHandler(async (req, res, next) => {
     if (report.progress === "workshopcompleted") {
         report.reportStatus = "completed"
         await report.save()
-        let user = await User.findById(report.createdBy)
-        sendSms(user.phone, `The workshop has finished the fixing, check it out.`, next)
+        const workshop = report.selectedWorkshopOffer
+        const date = new Date()
+        const monthName = monthNames[date.getMonth()]
+        const topFiveWorkshop = await topFiveModel.find({ type: "workshop", user: workshop, year: date.getFullYear() })
+        if (!topFiveWorkshop) {
+            await topFiveModel.create({
+                type: "workshop",
+                user: workshop,
+                year: date.getFullYear(),
+                months: { [monthName]: { weekNumber: Math.ceil(date.getDay() / 7), Completed: 1 } },
+            })
+        } else {
+            let month = topFiveWorkshop.months[monthName]
+            if (!month) {
+                topFiveWorkshop.months[monthName] = { weekNumber: Math.ceil(date.getDay() / 7), Completed: 1 }
+            } else {
+                topFiveWorkshop.months[monthName] = {
+                    weekNumber: Math.ceil(date.getDay() / 7),
+                    Completed: month.Completed + 1,
+                }
+            }
+            await topFiveWorkshop.save()
+        }
+        const driver = report.selectedDriverOffer
+        const topFiveDriver = await topFiveModel.find({ type: "driver", user: driver, year: new Date().getFullYear() })
+        if (!topFiveDriver) {
+            await topFiveModel.create({
+                type: "driver",
+                user: driver,
+                year: date.getFullYear(),
+                months: { [monthName]: { weekNumber: Math.ceil(date.getDay() / 7), Completed: 1 } },
+            })
+        } else {
+            let month = topFiveDriver.months[monthName]
+            if (!month) {
+                topFiveDriver.months[monthName] = { weekNumber: Math.ceil(date.getDay() / 7), Completed: 1 }
+            } else {
+                topFiveDriver.months[monthName] = {
+                    weekNumber: Math.ceil(date.getDay() / 7),
+                    Completed: month.Completed + 1,
+                }
+            }
+            await topFiveDriver.save()
+        }
+        const insurance = report.createdBy
+        const topFiveInsurance = await topFiveModel.find({ type: "insurance", user: insurance, year: new Date().getFullYear() })
+        if (!topFiveInsurance) {
+            await topFiveModel.create({
+                type: "insurance",
+                user: insurance,
+                year: date.getFullYear(),
+                months: { [monthName]: { weekNumber: Math.ceil(date.getDay() / 7), Completed: 1 } },
+            })
+        } else {
+            let month = topFiveInsurance.months[monthName]
+            if (!month) {
+                topFiveInsurance.months[monthName] = { weekNumber: Math.ceil(date.getDay() / 7), Completed: 1 }
+            } else {
+                topFiveInsurance.months[monthName] = {
+                    weekNumber: Math.ceil(date.getDay() / 7),
+                    Completed: month.Completed + 1,
+                }
+            }
+            await topFiveInsurance.save()
+        }
 
         res.status(200).json({ data: report })
     } else {

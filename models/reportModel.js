@@ -11,16 +11,27 @@ const reportSchema = new mongoose.Schema(
         manufactureYear: Date,
         reportDescription: String,
         partsList: [String], // Optional, array of parts
+        isPartAvailable: Boolean, //true if user have parts
+        selectedVendor: {
+            type: mongoose.Schema.ObjectId,
+            ref: "User",
+        },
+        isWorkshopHaveParts: Boolean, //true if user have parts
         locationOfVehicle: String,
         haveParts: Boolean, //true if user have parts
         reportStatus: {
             type: String,
-            enum: ["pending", "completed","progress", "cancelled"],
+            enum: ["pending", "completed", "progress", "cancelled"],
+            default: "pending",
+        },
+        vendorStatus: {
+            type: String,
+            enum: ["pending", "delivered", "shipping"],
             default: "pending",
         },
         progress: {
             type: String,
-            enum: ["workshopoffers", "driveroffers", "workshopinprogress", "workshopcompleted", "driverinprogress", "drivercompleted"],
+            enum: ["workshopoffers", "driveroffers", "workshopinprogress", "workshopcompleted", "driverinprogress"],
             default: "workshopoffers",
         },
         selectedWorkshopOffer: {
@@ -60,9 +71,6 @@ reportSchema.virtual("offers", {
 })
 
 // reportSchema.populate("selectedWorkshopOffer")
-
-
-
 
 // Create and export the model
 const Report = mongoose.model("Report", reportSchema)

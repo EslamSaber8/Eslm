@@ -8,7 +8,7 @@ const weeklyCheckSchema = new mongoose.Schema(
             required: true,
         },
         Completed: {
-            type: number,
+            type: Number,
         },
         // Add more fields as needed for details about the weekly check
     },
@@ -24,6 +24,11 @@ const topFiveSchema = new mongoose.Schema(
         year: {
             type: Number,
             required: [true, "Please provide a year"],
+        },
+        user:{
+            type: mongoose.Schema.ObjectId,
+            ref: "User",
+            required: [true, "Please provide a user"],
         },
         months: {
             January: [weeklyCheckSchema],
@@ -43,4 +48,4 @@ const topFiveSchema = new mongoose.Schema(
     { timestamps: true }
 )
 
-module.exports = mongoose.model("Brand", topFiveSchema)
+module.exports = mongoose.model("TopFive", topFiveSchema)
