@@ -5,6 +5,7 @@ const {
   findSpecificOrder,
   filterOrderForLoggedUser,
   updateOrderToPaid,
+  lists
 } = require('../services/orderService');
 
 const authService = require('../services/authService');
@@ -12,6 +13,7 @@ const authService = require('../services/authService');
 const router = express.Router();
 
 router.use(authService.protect);
+router.route('/vendorOwner').get(authService.allowedTo('vendor'), lists);
 router.route('/:cartId').post(authService.allowedTo('workshop'), createCashOrder);
 router.get(
   '/',
