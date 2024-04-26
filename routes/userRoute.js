@@ -1,5 +1,6 @@
 const express = require("express")
 const {
+
     getUserValidator,
     createUserValidator,
     updateUserValidator,
@@ -8,6 +9,7 @@ const {
     updateLoggedUserValidator,
     changeLoggedUserPasswordValidator,
 } = require("../utils/validators/userValidator")
+
 
 const {
     getUsers,
@@ -35,6 +37,7 @@ router.get("/getMe", getLoggedUserData, getUser)
 router.put("/changeMyPassword", changeLoggedUserPasswordValidator, updateLoggedUserPassword)
 router.put("/updateMe", uploadMultipleImages, updateLoggedUserValidator, updateLoggedUserData)
 router.delete("/deleteMe", deleteLoggedUserData)
+
 
 // Admin
 router.use(authService.allowedTo("admin", "superAdmin"))
