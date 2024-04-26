@@ -41,5 +41,9 @@
     "resetCodeInvalid": "رمز التحقق غير صحيح",
     "emailAlreadyVerified": "البريد الإلكتروني مفعل بالفعل",
     "emailVerified": "تم تفعيل البريد الإلكتروني",
-    "verifySend": "تم إرسال رمز التحقق إلى بريدك الإلكتروني"
+    "verifySend": "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
+    "Invalid value": "قيمة غير صحيحة",
+    "Invalid report id format": "صيغة رقم التقرير غير صحيحة",
+    "You must enter your current password": "يجب إدخال كلمة المرور الحالية",
+    "user is not defined": "المستخدم غير معرف"
 }

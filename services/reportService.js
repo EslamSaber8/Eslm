@@ -58,6 +58,14 @@ exports.createReport = asyncHandler(async (req, res, next) => {
             })
         }
     }
+    if (req.body.isPartAvailable === false || req.body.isPartAvailable === "false") {
+        let vendor = await User.find({ role: "vendor", verified: true })
+        if (vendor) {
+            vendor.forEach(async (vendor) => {
+                sendSms(vendor.phone, `You have a new report to post an offer on it.`, next)
+            })
+        }
+    }
     return res.status(201).json({ data: document, sentWorkshopNumber: sentWorkshop })
 })
 
@@ -73,6 +81,7 @@ exports.updateReport = asyncHandler(async (req, res, next) => {
             carModel: req.body.carModel,
             carNumber: req.body.carNumber,
             reportDescription: req.body.reportDescription,
+            isPartAvailable: req.body.isPartAvailable,
             partsList: req.body.partsList,
             locationOfVehicle: req.body.locationOfVehicle,
             selectWorkshop: req.body.selectWorkshop,
@@ -141,6 +150,23 @@ exports.getReportsForWorkshops = asyncHandler(async (req, res, next) => {
         data: reports,
     })
 })
+exports.acceptVendorOffer = asyncHandler(async (req, res, next) => {
+    const report = await Report.findById(req.params.id)
+    if (!report) {
+        return next(new ApiError(`No document for this id ${req.params.id}`, 404))
+    }
+    if (report.selectedVendor) {
+        return next(new ApiError(`You already accepted an offer`, 400))
+    }
+    if (report.isWorkshopHaveParts) {
+        return next(new ApiError(`You already accepted parts from workshops`, 400))
+    }
+    report.selectedVendor = req.body.vendorId
+    await report.save()
+    let vendor = await User.findById(req.body.vendorId)
+    await sendSms(vendor.phone, `Your offer has been accepted.`, next)
+    res.status(200).json({ data: report })
+})
 
 exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
     const report = await Report.findById(req.params.id)
@@ -150,7 +176,12 @@ exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
     if (report.selectedWorkshopOffer) {
         return next(new ApiError(`You already accepted an offer`, 400))
     }
-    console.log(req.body.workshopId)
+    report.isWorkshopHaveParts = req.body.isWorkshopHaveParts
+
+    if (report.selectedVendor) {
+        report.isWorkshopHaveParts = false
+    }
+
     if (report.progress === "workshopoffers") {
         report.progress = "driveroffers"
         report.selectedWorkshopOffer = req.body.workshopId
@@ -217,6 +248,23 @@ exports.workshopFinishFixing = asyncHandler(async (req, res, next) => {
         await report.save()
         let selectInsuranceCompany = await User.findById(report.createdBy)
         await sendSms(selectInsuranceCompany.phone, `The workshop has finished the fixing, check it out.`, next)
+
+        res.status(200).json({ data: report })
+    } else {
+        return next(new ApiError(`You are not allowed to perform this action`, 403))
+    }
+})
+
+exports.vendorFinishDelivery = asyncHandler(async (req, res, next) => {
+    const report = await Report.findById(req.params.id)
+    if (!report) {
+        return next(new ApiError(`No document for this id ${req.params.id}`, 404))
+    }
+    if (report.selectedVendor) {
+        report.vendorStatus = "delivered"
+        await report.save()
+        let selectInsuranceCompany = await User.findById(report.createdBy)
+        await sendSms(selectInsuranceCompany.phone, `The vendor has finished the delivery, check it out.`, next)
 
         res.status(200).json({ data: report })
     } else {

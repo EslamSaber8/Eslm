@@ -13,6 +13,8 @@ const {
     workshopFinishFixing,
     driverFinishDelivery,
     completeReport,
+    acceptVendorOffer,
+    vendorFinishDelivery,
 } = require("../services/reportService")
 const { getReportValidator, createReportValidator, updateReportValidator, deleteReportValidator } = require("../utils/validators/reportValidator")
 const { uploadMultipleImages } = require("../utils/uploadImages")
@@ -37,6 +39,11 @@ router
     .route("/driver/:id")
     .post(authService.allowedTo("admin", "superAdmin", "insurance"), acceptDriverOffer)
     .put(authService.allowedTo("admin", "superAdmin", "insurance", "driver"), driverFinishDelivery)
+
+router
+    .route("/vendor/:id")
+    .post(authService.allowedTo("admin", "superAdmin", "insurance"), acceptVendorOffer)
+    .put(authService.allowedTo("admin", "superAdmin", "insurance", "vendor"), vendorFinishDelivery)
 
 router.route("/complete/:id").post(authService.allowedTo("admin", "superAdmin", "insurance"), completeReport)
 
