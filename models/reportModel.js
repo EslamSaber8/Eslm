@@ -62,7 +62,6 @@ const reportSchema = new mongoose.Schema(
         toObject: { virtuals: true },
     }
 )
-
 //
 reportSchema.virtual("offers", {
     ref: "Offer",

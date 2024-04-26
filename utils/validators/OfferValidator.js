@@ -12,11 +12,7 @@ exports.createOfferValidator = [
 
         .notEmpty()
         .withMessage("Date is required"),
-    check('description')
-    .notEmpty()
-    .withMessage('Product description is required')
-    .isLength({ max: 2000 })
-    .withMessage('Too long description'),
+    check("description").notEmpty().withMessage("Product description is required").isLength({ max: 2000 }).withMessage("Too long description"),
     body("partPrice").isNumeric().optional(),
 
     check("report")
@@ -30,16 +26,13 @@ exports.createOfferValidator = [
                 }
             })
         ),
-    
+
     validatorMiddleware,
 ]
 
 exports.createDriverOfferValidator = [
     body("price").isNumeric().notEmpty().withMessage("price is required"),
-    body("deadline")
-        .toDate()
-        .notEmpty()
-        .withMessage("Date is required"),
+    body("deadline").toDate().notEmpty().withMessage("Date is required"),
     check("report")
         .isMongoId()
         .withMessage("Invalid report id format")
@@ -51,20 +44,28 @@ exports.createDriverOfferValidator = [
                 }
             })
         ),
-    
+
     validatorMiddleware,
 ]
 
+exports.createVendorOfferValidator = [
+    body("deadline").toDate().notEmpty().withMessage("Date is required"),
+    check("description").optional().isLength({ max: 2000 }).withMessage("Too long description"),
+    body("partPrice").isNumeric().notEmpty(),
+    check("report")
+        .isMongoId()
+        .withMessage("Invalid report id format")
+        .custom((val, { req }) =>
+            // Check if logged user create offer before
+            Offer.findOne({ createdBy: req.user._id, report: req.body.report }).then((offer) => {
+                if (offer) {
+                    return Promise.reject(new Error("You already created a offer before"))
+                }
+            })
+        ),
 
-
-
-
-
-
-
-
-
-
+    validatorMiddleware,
+]
 
 exports.updateOfferValidator = [
     body("price").optional().isNumeric().withMessage("Price must be a number"),

@@ -71,7 +71,8 @@ exports.getAll = (Model, modelName = "") =>
                                   key != "search" &&
                                   !mongoose.Types.ObjectId.isValid(req.query[key]) &&
                                   typeof req.query[key] != "boolean" &&
-                                  key != "verified" &&
+                                  req.query[key] ==="true"&&
+                                  req.query[key] === "false"&&
                                   key != "year"
                               ) {
                                   {
