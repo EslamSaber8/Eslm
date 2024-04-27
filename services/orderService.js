@@ -119,12 +119,17 @@ exports.lists = asyncHandler(async (req, res, next) => {
     const orderData = {
       shippingAddress: order.shippingAddress,
       user: order.user,
-      cartItems: []
+      cartItems: [],
+      totalPrice: 0,
+      id:order._id
     };
 
     order.cartItems.forEach((cartItem) => {
-      if (cartItem.product.createdBy._id.toString() === req.user._id.toString()) {
-        orderData.cartItems.push(cartItem.product);
+      if (cartItem.product.createdBy._id.toString() === req.user._id.toString()) {``
+        const itemPrice = cartItem.product.price * cartItem.quantity;
+         orderData.cartItems.push({cartItem:cartItem.product, totalPrice: itemPrice });
+        // orderData.cartItems.push({cartItem.product, totalPrice: itemPrice });
+        orderData.totalPrice += itemPrice;
       }
     });
 if( !orderData.cartItems.length<1) result.push(orderData);
