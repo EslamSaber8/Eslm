@@ -95,15 +95,40 @@ exports.updateOrderToPaid = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: 'success', data: updatedOrder });
 });
 
-exports.lists = asyncHandler(async (req, res, next) => {
-const list=[];
-  const orders = await Order.find();
-  orders.map((el) => {
-    el.cartItems.forEach(element => {
-      if(element.product.createdBy._id.toString()== req.user._id.toString()) list.push(element);
-    });
-    return
-})
+// exports.lists = asyncHandler(async (req, res, next) => {
+// const list=[];
+//   const orders = await Order.find();
+//   orders.map((el) => {
+//     el.cartItems.forEach(element => {
+//       if(element.product.createdBy._id.toString()== req.user._id.toString()) list.push(element);
+//     });
+//     return
+// })
 
-  res.status(200).json({ status: 'success', data:list });
+//   res.status(200).json({ status: 'success', data:list });
+// });
+
+
+
+
+exports.lists = asyncHandler(async (req, res, next) => {
+  const result = [];
+  const orders = await Order.find();
+
+  orders.forEach((order) => {
+    const orderData = {
+      shippingAddress: order.shippingAddress,
+      user: order.user,
+      cartItems: []
+    };
+
+    order.cartItems.forEach((cartItem) => {
+      if (cartItem.product.createdBy._id.toString() === req.user._id.toString()) {
+        orderData.cartItems.push(cartItem.product);
+      }
+    });
+if( !orderData.cartItems.length<1) result.push(orderData);
+  
+  });
+  res.status(200).json({ status: 'success', data: result });
 });
