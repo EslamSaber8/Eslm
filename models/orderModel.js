@@ -61,7 +61,7 @@ orderSchema.pre(/^find/, function (next) {
     select: 'name profileImg email phone',
   }).populate({
     path: 'cartItems.product',
-    select: 'title imageCover createdBy workshopLocationLat workshopLocationLong ',
+    select: 'title imageCover createdBy price workshopLocationLat workshopLocationLong ',
   });
 
   next();

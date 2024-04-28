@@ -95,22 +95,6 @@ exports.updateOrderToPaid = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: 'success', data: updatedOrder });
 });
 
-// exports.lists = asyncHandler(async (req, res, next) => {
-// const list=[];
-//   const orders = await Order.find();
-//   orders.map((el) => {
-//     el.cartItems.forEach(element => {
-//       if(element.product.createdBy._id.toString()== req.user._id.toString()) list.push(element);
-//     });
-//     return
-// })
-
-//   res.status(200).json({ status: 'success', data:list });
-// });
-
-
-
-
 exports.lists = asyncHandler(async (req, res, next) => {
   const result = [];
   const orders = await Order.find();
@@ -121,19 +105,22 @@ exports.lists = asyncHandler(async (req, res, next) => {
       user: order.user,
       cartItems: [],
       totalPrice: 0,
-      id:order._id
+      id: order._id
     };
 
     order.cartItems.forEach((cartItem) => {
-      if (cartItem.product.createdBy._id.toString() === req.user._id.toString()) {``
+      // Check if cartItem.product exists and has a createdBy property
+      if (cartItem.product && cartItem.product.createdBy && cartItem.product.createdBy._id.toString() === req.user._id.toString()) {
         const itemPrice = cartItem.product.price * cartItem.quantity;
-         orderData.cartItems.push({cartItem:cartItem.product, totalPrice: itemPrice });
-        // orderData.cartItems.push({cartItem.product, totalPrice: itemPrice });
+        orderData.cartItems.push({ cartItem: cartItem.product, totalPrice: itemPrice });
         orderData.totalPrice += itemPrice;
       }
     });
-if( !orderData.cartItems.length<1) result.push(orderData);
-  
+
+    if (orderData.cartItems.length > 0) {
+      result.push(orderData);
+    }
   });
+
   res.status(200).json({ status: 'success', data: result });
 });
