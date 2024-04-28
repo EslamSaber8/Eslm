@@ -49,9 +49,11 @@ exports.createDriverOfferValidator = [
 ]
 
 exports.createVendorOfferValidator = [
+    body("price").isNumeric().notEmpty().withMessage("price is required"),
     body("deadline").toDate().notEmpty().withMessage("Date is required"),
-    check("description").optional().isLength({ max: 2000 }).withMessage("Too long description"),
-    body("partPrice").isNumeric().notEmpty(),
+    check("description").isLength({ max: 2000 }).withMessage("Too long description"),
+    body("partPrice").isNumeric().optional(),
+
     check("report")
         .isMongoId()
         .withMessage("Invalid report id format")

@@ -96,14 +96,31 @@ exports.updateOrderToPaid = asyncHandler(async (req, res, next) => {
 });
 
 exports.lists = asyncHandler(async (req, res, next) => {
-const list=[];
+  const result = [];
   const orders = await Order.find();
-  orders.map((el) => {
-    el.cartItems.forEach(element => {
-      if(element.product.createdBy._id.toString()== req.user._id.toString()) list.push(element);
-    });
-    return
-})
 
-  res.status(200).json({ status: 'success', data:list });
+  orders.forEach((order) => {
+    const orderData = {
+      shippingAddress: order.shippingAddress,
+      user: order.user,
+      cartItems: [],
+      totalPrice: 0,
+      id: order._id
+    };
+
+    order.cartItems.forEach((cartItem) => {
+      // Check if cartItem.product exists and has a createdBy property
+      if (cartItem.product && cartItem.product.createdBy && cartItem.product.createdBy._id.toString() === req.user._id.toString()) {
+        const itemPrice = cartItem.product.price * cartItem.quantity;
+        orderData.cartItems.push({ cartItem: cartItem.product, totalPrice: itemPrice });
+        orderData.totalPrice += itemPrice;
+      }
+    });
+
+    if (orderData.cartItems.length > 0) {
+      result.push(orderData);
+    }
+  });
+
+  res.status(200).json({ status: 'success', data: result });
 });

@@ -16,7 +16,7 @@ router.route("/driver").post(authService.allowedTo("driver"), createDriverOfferV
 router.route("/vendor").post(authService.allowedTo("vendor"), createVendorOfferValidator, createOffer)
 router
     .route("/")
-    .get(authService.allowedTo("admin", "superAdmin", "insurance"), getOffers)
+    .get(authService.allowedTo("admin", "superAdmin", "insurance", "driver", "workshop", "vendor"), getOffers)
     .post(authService.allowedTo("driver", "workshop", "vendor"), createOfferValidator, createOffer)
 router
     .route("/:id")
