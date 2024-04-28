@@ -18,7 +18,6 @@ const orderSchema = new mongoose.Schema(
         price: Number,
       },
     ],
-
     taxPrice: {
       type: Number,
       default: 0,
@@ -68,4 +67,3 @@ orderSchema.pre(/^find/, function (next) {
 });
 
 module.exports = mongoose.model('Order', orderSchema);
-

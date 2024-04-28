@@ -43,6 +43,13 @@ const userSchema = new mongoose.Schema(
             required: [true, "password required"],
             minlength: [6, "Too short password"],
         },
+        notifications: [
+            {
+                type: { type: String, enum: ["report", "order"], default: "report" },
+                moveID: String,
+                message: String,
+            },
+        ],
         passwordChangedAt: Date,
         passwordResetCode: String,
         passwordResetExpires: Date,

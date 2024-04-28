@@ -20,6 +20,7 @@ const { getReportValidator, createReportValidator, updateReportValidator, delete
 const { uploadMultipleImages } = require("../utils/uploadImages")
 router.use(authService.protect)
 router.get("/workshop", authService.allowedTo("workshop"), getReportsForWorkshops)
+
 //resizeImage,
 router
     .route("/:id")

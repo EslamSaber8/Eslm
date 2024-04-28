@@ -46,7 +46,7 @@ exports.createUser = factory.createOne(User)
 // @route   PUT /api/v1/users/:id
 // @access  Private/Admin
 exports.updateUser = asyncHandler(async (req, res, next) => {
-    console.log(req.body);
+    console.log(req.body)
     const document = await User.findByIdAndUpdate(
         req.params.id,
         {
@@ -167,4 +167,18 @@ exports.deleteLoggedUserData = asyncHandler(async (req, res, next) => {
     await User.findByIdAndUpdate(req.user._id, { active: false })
 
     res.status(204).json({ status: "Success" })
+})
+
+exports.getNotifications = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user._id)
+    if (!user.notifications) user.notifications = []
+    return res.status(200).json({ data: user.notifications })
+})
+
+exports.deleteNotification = asyncHandler(async (req, res, next) => {
+    const user = await User.findByIdAndUpdate(req.user._id, {
+        $pull: { notifications: { _id: req.params.id } },
+    })
+
+    res.status(200).json({ data: user.notifications })
 })

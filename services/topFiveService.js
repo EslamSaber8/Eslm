@@ -1,6 +1,7 @@
 const expressAsyncHandler = require("express-async-handler")
 const topFiveModel = require("../models/topFiveModel")
 const User = require("../models/userModel")
+const productModel = require("../models/productModel")
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 exports.getTopFive = expressAsyncHandler(async (req, res, next) => {
@@ -32,12 +33,14 @@ exports.getTopFive = expressAsyncHandler(async (req, res, next) => {
     const workshopMembers = await User.find({ role: "workshop" }).countDocuments()
     const driverMembers = await User.find({ role: "driver" }).countDocuments()
     const vevdorMembers = await User.find({ role: "vendor" }).countDocuments()
+    const topFiveProducts = await productModel.find().sort({ sold: -1 }).limit(5)
 
     return res.status(200).json({
         data: {
             topFiveWorkshops: finalWorkshop,
             topFiveDriver: finalDriver,
             topFiveInsuranceCompany: finalInsuranceCompany,
+            topFiveProducts,
             workshopMembers,
             driverMembers,
             vevdorMembers,

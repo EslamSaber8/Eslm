@@ -300,12 +300,28 @@ exports.GoogleAuth = asyncHandler(async (req, res, next) => {
 })
 
 exports.remoteLogin = asyncHandler(async (req, res, next) => {
-    console.log(req.body)
-    // const user = await User.findOne({ email }).select("+password")
-    // if (!user || !(await bcrypt.compare(password, user.password))) {
-    //     return next(new ApiError(req.__("incorrectEmailOrPass"), 401))
-    // }
-    // const token = createToken(user._id)
-    res.status(200).json({ data: req.body, token: "token" })
+    const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET_KEY)
+    const currentUser = await User.findById(decoded.userId)
+    if (!currentUser) {
+        return next(new ApiError(req.__("noUserWithToken"), 401))
+    }
+    // 4) Check if user change his password after token created
+    if (currentUser.passwordChangedAt) {
+        const passChangedTimestamp = parseInt(currentUser.passwordChangedAt.getTime() / 1000, 10)
+        // Password changed after token created (Error)
+        if (passChangedTimestamp > decoded.iat) {
+            return next(new ApiError(req.__("userChangedPasswordRecently"), 401))
+        }
+    }
+    res.status(200).json({
+        status: true,
+        data: {
+            first_name: currentUser.name,
+            email: currentUser.email,
+            is_verified_email: currentUser.verified ? "Y" : "N",
+            phone: currentUser.phone,
+            photo_url: currentUser.avatar,
+        },
+    })
     // res.status(200).json({ data: user, token })
 })
