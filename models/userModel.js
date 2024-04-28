@@ -45,9 +45,9 @@ const userSchema = new mongoose.Schema(
         },
         notifications: [
             {
-                type: { type: String, enum: ["report",], default: "" },
+                type: { type: String, enum: ["report", "order"], default: "report" },
+                moveID: String,
                 message: String,
-
             },
         ],
         passwordChangedAt: Date,

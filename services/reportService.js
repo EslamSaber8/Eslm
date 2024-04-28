@@ -92,6 +92,8 @@ exports.createReport = asyncHandler(async (req, res, next) => {
         allowedWorkshop.forEach(async (workshop) => {
             let user = await User.findById(workshop)
             if (user.role === "workshop") {
+                user.notifications.push({ type: "report", moveID: document._id, message: "You have a new report to post an offer on it." })
+                await user.save()
                 sendSms(user.phone, `You have a new report to post an offer on it.`, next)
                 sentWorkshop++
             }
@@ -101,6 +103,8 @@ exports.createReport = asyncHandler(async (req, res, next) => {
         // console.log(workshop);
         if (workshop) {
             workshop.forEach(async (workshop) => {
+                workshop.notifications.push({ type: "report", moveID: document._id, message: "You have a new report to post an offer on it." })
+                await workshop.save()
                 sendSms(workshop.phone, `You have a new report to post an offer on it.`, next)
                 sentWorkshop++
             })
@@ -110,6 +114,8 @@ exports.createReport = asyncHandler(async (req, res, next) => {
         let vendor = await User.find({ role: "vendor", verified: true })
         if (vendor) {
             vendor.forEach(async (vendor) => {
+                vendor.notifications.push({ type: "report", moveID: document._id, message: "You have a new report to post an offer on it." })
+                await vendor.save()
                 sendSms(vendor.phone, `You have a new report to post an offer on it.`, next)
             })
         }
@@ -216,10 +222,14 @@ exports.acceptVendorOffer = asyncHandler(async (req, res, next) => {
     }
     await report.save()
     let vendor = await User.findById(req.body.vendorId)
+    vendor.notifications.push({ type: "report", moveID: report._id, message: "Your offer has been accepted." })
+    await vendor.save()
     await sendSms(vendor.phone, `Your offer has been accepted.`, next)
     if (report.selectedWorkshopOffer && !report.isWorkshopHaveParts) {
         let user = await User.find({ role: "driver", verified: true })
         user.forEach(async (user) => {
+            user.notifications.push({ type: "report", moveID: report._id, message: "You have a new report to post an offer on it." })
+            await user.save()
             sendSms(user.phone, `You have a new report to post an offer on it.`, next)
         })
     }
@@ -248,10 +258,14 @@ exports.acceptWorkshopOffer = asyncHandler(async (req, res, next) => {
         }
         await report.save()
         let workshop = await User.findById(req.body.workshopId)
+        workshop.notifications.push({ type: "report", moveID: report._id, message: "Your offer has been accepted." })
+        await workshop.save()
         await sendSms(workshop.phone, `Your offer has been accepted.`, next)
         if (report.isWorkshopHaveParts || report.selectedVendor) {
             let user = await User.find({ role: "driver", verified: true })
             user.forEach(async (user) => {
+                user.notifications.push({ type: "report", moveID: report._id, message: "You have a new report to post an offer on it." })
+                await user.save()
                 sendSms(user.phone, `You have a new report to post an offer on it.`, next)
             })
         }
@@ -275,6 +289,8 @@ exports.acceptDriverOffer = asyncHandler(async (req, res, next) => {
         report.selectedDriverOffer = req.body.driverId
         await report.save()
         let driver = await User.findById(req.body.driverId)
+        driver.notifications.push({ type: "report", moveID: report._id, message: "Your offer has been accepted." })
+        await driver.save()
         await sendSms(driver.phone, `Your offer has been accepted.`, next)
 
         res.status(200).json({ data: report })
@@ -292,6 +308,8 @@ exports.driverFinishDelivery = asyncHandler(async (req, res, next) => {
         report.progress = "workshopinprogress"
         await report.save()
         let workshop = await User.findById(report.selectedWorkshopOffer)
+        workshop.notifications.push({ type: "report", moveID: report._id, message: "The driver has finished the delivery." })
+        await workshop.save()
         await sendSms(workshop.phone, `The driver has finished the delivery.`, next)
 
         res.status(200).json({ data: report })
@@ -310,6 +328,12 @@ exports.workshopFinishFixing = asyncHandler(async (req, res, next) => {
         // report.reportStatus = "completed"
         await report.save()
         let selectInsuranceCompany = await User.findById(report.createdBy)
+        selectInsuranceCompany.notifications.push({
+            type: "report",
+            moveID: report._id,
+            message: "The workshop has finished the fixing, check it out.",
+        })
+        await selectInsuranceCompany.save()
         await sendSms(selectInsuranceCompany.phone, `The workshop has finished the fixing, check it out.`, next)
 
         res.status(200).json({ data: report })
@@ -327,6 +351,12 @@ exports.vendorFinishDelivery = asyncHandler(async (req, res, next) => {
         report.vendorStatus = "delivered"
         await report.save()
         let selectInsuranceCompany = await User.findById(report.createdBy)
+        selectInsuranceCompany.notifications.push({
+            type: "report",
+            moveID: report._id,
+            message: "The vendor has finished the delivery, check it out.",
+        })
+        await selectInsuranceCompany.save()
         await sendSms(selectInsuranceCompany.phone, `The vendor has finished the delivery, check it out.`, next)
 
         res.status(200).json({ data: report })
