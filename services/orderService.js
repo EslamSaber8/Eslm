@@ -125,3 +125,62 @@ exports.lists = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: 'success', data: result });
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+// exports.updateVendor = asyncHandler(async (req, res, next) => {
+// const orders = await Order.find();
+// let cart=0;
+//   orders.forEach((order) => {
+
+//     order.cartItems.forEach((cartItem) => {
+//       if (cartItem.product && cartItem.product.createdBy && cartItem.product.createdBy._id.toString() === req.user._id.toString()) {
+//               if(cartItem.product._id.toString()==req.body.productId&&order.id==req.body.orderId){
+//                 console.log(cartItem.status)
+//                 cartItem.status=req.body.status;
+//                 console.log(cartItem.status)
+//                 cart=cartItem;
+//               }
+//       }
+//     });
+  
+//   });
+
+//   res.status(200).json({ status: 'success', data:cart});
+// });
+
+
+
+exports.updateVendor = asyncHandler(async (req, res, next) => {
+  const orders = await Order.find();
+  let updatedCartItem = null;
+
+  orders.forEach(async (order) => {
+    order.cartItems.forEach(async (cartItem) => {
+      if ( cartItem.product &&cartItem.product.createdBy && cartItem.product.createdBy._id.toString() === req.user._id.toString()
+      ) { if ( cartItem.product._id.toString() === req.body.productId &&  order.id === req.body.orderId  ) {
+          cartItem.status = req.body.status;
+
+          // Save the changes to the database
+          try {
+            const savedOrder = await order.save();
+            
+          } catch (error) {
+            return res.status(500).json({ status: 'error', error: error.message });
+          }
+        }
+      }
+    });
+  });
+
+  res.status(200).json({ status: 'success', data: 'status change success' });
+});

@@ -15,7 +15,13 @@ exports.createProductValidator = [
             return true
         }),
     check("description").notEmpty().withMessage("Product description is required").isLength({ max: 2000 }).withMessage("Too long description"),
-    check("quantity").notEmpty().withMessage("Product quantity is required").isNumeric().withMessage("Product quantity must be a number"),
+    check("quantity").notEmpty().withMessage("Product quantity is required").isNumeric()
+    .withMessage("Product quantity must be a number").custom(async (value, { req }) => {
+        if (value < 0) {
+            throw new Error("quantity must be more than 0")
+        }
+        return true
+    }),
     check("sold").optional().isNumeric().withMessage("Product quantity must be a number"),
 
     body("year").toDate().notEmpty().withMessage("Date year is required"),
@@ -33,8 +39,8 @@ exports.createProductValidator = [
         .isNumeric()
         .withMessage("Product Discount must be a number")
         .custom((value, { req }) => {
-            if (value > 100) {
-                throw new Error("Discount  must be lower than 100%")
+            if (value > 100||value <0) {
+                throw new Error("Discount  must be between 0 and 100")
             }
             req.body.priceAfterDiscount = req.body.price - (req.body.price * req.body.Discount) / 100
             return true
@@ -137,13 +143,28 @@ exports.updateProductValidator = [
         .isNumeric()
         .withMessage("Product Discount must be a number")
         .custom(async (value, { req }) => {
-            if (value > 100) {
-                throw new Error("Discount  must be lower than 100%")
+            if (value > 100||value <0) {
+                throw new Error("Discount  must be between 0 and 100")
             }
             const product = await productModel.findById(req.params.id)
             req.body.priceAfterDiscount = product.price - (product.price * req.body.Discount) / 100
             return true
         }),
+        check("quantity")
+        .optional()
+        .isNumeric()
+        .withMessage("Product quantity must be a number")
+        .custom(async (value, { req }) => {
+            if (value < 0) {
+                throw new Error("quantity must be more than 0")
+            }
+            return true
+        }),
+
+
+
+
+
         check("fixed")
         .optional()
         .isNumeric()
