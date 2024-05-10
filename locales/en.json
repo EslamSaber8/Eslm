@@ -26,6 +26,7 @@
 	"userDeleted": "User is deleted",
 	"passReqConf": "Password confirmation is required",
 	"licenseReq": "License is required",
+	"governmentReq":"government is required",
 	"signupAs": "You can't sign up as",
 	"incorrectEmailOrPass": "Incorrect email or password",
 	"youAreNotLoggedToAccess": "You are not login, Please login to get access this route",

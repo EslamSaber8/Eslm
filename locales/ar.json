@@ -26,6 +26,7 @@
     "userDeleted": "تم حذف المستخدم",
     "passReqConf": "ادخل تأكيد كلمة المرور",
     "licenseReq": "ارفع صورة الرخصة",
+    "governmentReq":"ادخل المدنية",
     "signupAs": "لا يمكنك التسجيل كـ",
     "incorrectEmailOrPass": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
     "youAreNotLoggedToAccess": "يجب تسجيل الدخول للوصول إلى هذه الصفحة",
