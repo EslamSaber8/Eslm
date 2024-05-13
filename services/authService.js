@@ -38,6 +38,7 @@ exports.signupAs = asyncHandler(async (req, res, next) => {
         license: req.body.license,
         idImg: req.body.idImg,
         government: req.body.government,
+
     })
 
     // 2- Generate token

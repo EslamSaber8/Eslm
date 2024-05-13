@@ -81,7 +81,6 @@ exports.updateOrderToPaid = asyncHandler(async (req, res, next) => {
     order.deliveredAt = Date.now()
 
     const updatedOrder = await order.save()
-
     res.status(200).json({ status: "success", data: updatedOrder })
 })
 
@@ -126,3 +125,4 @@ exports.updateVendor = asyncHandler(async (req, res, next) => {
     await orders.save()
     res.status(200).json({ status: "success", data: "status change success" })
 })
+

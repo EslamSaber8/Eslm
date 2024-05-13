@@ -8,7 +8,6 @@ const userSchema = new mongoose.Schema(
             trim: true,
             required: [true, "name required"],
         },
-
         slug: {
             type: String,
             lowercase: true,
@@ -72,6 +71,7 @@ const userSchema = new mongoose.Schema(
         },
         locations: String,
         government: {
+
             type: String,
             required: [true, "government required"],
         },
