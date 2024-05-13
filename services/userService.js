@@ -55,6 +55,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
             phone: req.body.phone,
             avatar: req.body.avatar,
             accountState: req.body.accountState,
+            rejectMassage:req.body.rejectMassage,
             email: req.body.email,
             license: req.body.license,
             idImg: req.body.idImg,

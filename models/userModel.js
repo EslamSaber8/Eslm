@@ -38,6 +38,9 @@ const userSchema = new mongoose.Schema(
             enum: ["underReview", "approved", "rejected"],
             default: "underReview",
         },
+        rejectMassage:{ 
+            type: String,
+        },
         password: {
             type: String,
             required: [true, "password required"],
