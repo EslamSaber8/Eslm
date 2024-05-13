@@ -1,25 +1,16 @@
-const express = require('express');
-const {
-  getCouponValidator,
-  createCouponValidator,
-  updateCouponValidator,
-  deleteProductValidator
-} = require("../utils/validators/couponValidator")
-const {
-  getCoupon,
-  getCoupons,
-  createCoupon,
-  updateCoupon,
-  deleteCoupon,
-} = require('../services/couponService');
 
-const authService = require('../services/authService');
+const express = require("express")
+const { createCouponValidator, getCouponValidator, updateCouponValidator, deleteProductValidator } = require("../utils/validators/couponValidator")
+const { getCoupon, getCoupons, createCoupon, updateCoupon, deleteCoupon } = require("../services/couponService")
 
-const router = express.Router();
+const authService = require("../services/authService")
 
-router.use(authService.protect, authService.allowedTo('admin', 'superAdmin'));
 
-router.route('/').get( getCoupons).post(createCouponValidator,createCoupon);
-router.route('/:id').get(getCouponValidator,getCoupon).put(updateCouponValidator,updateCoupon).delete(deleteProductValidator, deleteCoupon);
+const router = express.Router()
 
-module.exports = router;
+router.use(authService.protect, authService.allowedTo("admin", "superAdmin"))
+
+router.route("/").get(getCoupons).post(createCouponValidator, createCoupon)
+router.route("/:id").get(getCouponValidator, getCoupon).put(updateCouponValidator, updateCoupon).delete(deleteProductValidator, deleteCoupon)
+
+module.exports = router

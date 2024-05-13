@@ -5,10 +5,15 @@ const OfferSchema = new mongoose.Schema(
     {
         price: Number,
         deadline: Date,
-        partPrice: Number,
-        type:{
+        partPrice: [
+            {
+                partName: String,
+                price: Number,
+            },
+        ],
+        type: {
             type: String,
-            enum: ["workshop", "driver","vendor"],
+            enum: ["workshop", "driver", "vendor"],
             default: "workshop",
         },
         description: {

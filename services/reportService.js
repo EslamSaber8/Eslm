@@ -110,7 +110,20 @@ exports.createReport = asyncHandler(async (req, res, next) => {
             })
         }
     }
-    if (req.body.isPartAvailable === false || req.body.isPartAvailable === "false") {
+    if (
+        (req.body.selectVendor === true || req.body.selectVendor === "true") &&
+        (req.body.isPartAvailable === false || req.body.isPartAvailable === "false")
+    ) {
+        req.body.allowedVendor.forEach(async (vendor) => {
+            const vendors = await User.findById(vendor)
+            vendors.notifications.push({ type: "report", moveID: document._id, message: "You have a new report to post an offer on it." })
+            await vendors.save()
+            sendSms(vendors.phone, `You have a new report to post an offer on it.`, next)
+        })
+    } else if (
+        (req.body.selectVendor === false || req.body.selectVendor === "false") &&
+        (req.body.isPartAvailable === false || req.body.isPartAvailable === "false")
+    ) {
         let vendor = await User.find({ role: "vendor", verified: true })
         if (vendor) {
             vendor.forEach(async (vendor) => {

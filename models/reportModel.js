@@ -16,6 +16,7 @@ const reportSchema = new mongoose.Schema(
             type: mongoose.Schema.ObjectId,
             ref: "User",
         },
+        chaseNumber: String,
         isWorkshopHaveParts: Boolean, //true if user have parts
         locationOfVehicle: String,
         haveParts: Boolean, //true if user have parts
@@ -49,11 +50,20 @@ const reportSchema = new mongoose.Schema(
                 ref: "User",
             },
         ],
+        selectVendor: {
+            Boolean,
+        },
+        allowedVendor: [
+            {
+                type: mongoose.Schema.ObjectId,
+                ref: "User",
+            },
+        ],
         createdBy: {
             type: mongoose.Schema.ObjectId,
             ref: "User",
         },
-        uploadFiles: String, // Optional, array of file paths
+        uploadFiles: [String], // Optional, array of file paths
     },
     {
         timestamps: true,

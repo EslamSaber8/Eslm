@@ -26,7 +26,7 @@
 	"userDeleted": "User is deleted",
 	"passReqConf": "Password confirmation is required",
 	"licenseReq": "License is required",
-	"governmentReq":"government is required",
+	"governmentReq": "government is required",
 	"signupAs": "You can't sign up as",
 	"incorrectEmailOrPass": "Incorrect email or password",
 	"youAreNotLoggedToAccess": "You are not login, Please login to get access this route",
@@ -50,5 +50,6 @@
 	"quantity must be up than 0": "quantity must be up than 0",
 	"Product quantity must be a number": "Product quantity must be a number",
 	"Discount  must be lower than 100%": "Discount  must be lower than 100%",
-	"Discount  must be between 0 and 100": "Discount  must be between 0 and 100"
+	"Discount  must be between 0 and 100": "Discount  must be between 0 and 100",
+	"Invalid Report id format": "Invalid Report id format"
 }

@@ -7,13 +7,9 @@ exports.getOfferValidator = [check("id").isMongoId().withMessage("Invalid Offer 
 
 exports.createOfferValidator = [
     body("price").isNumeric().notEmpty().withMessage("price is required"),
-    body("deadline")
-        .toDate()
-
-        .notEmpty()
-        .withMessage("Date is required"),
+    body("deadline").toDate().notEmpty().withMessage("Date is required"),
     check("description").notEmpty().withMessage("Product description is required").isLength({ max: 2000 }).withMessage("Too long description"),
-    body("partPrice").isNumeric().optional(),
+    // body("partPrice").isNumeric().optional(),
 
     check("report")
         .isMongoId()
@@ -49,10 +45,10 @@ exports.createDriverOfferValidator = [
 ]
 
 exports.createVendorOfferValidator = [
-    body("price").isNumeric().notEmpty().withMessage("price is required"),
+    body("price").isNumeric().optional().withMessage("price is required"),
     body("deadline").toDate().notEmpty().withMessage("Date is required"),
     check("description").isLength({ max: 2000 }).withMessage("Too long description"),
-    body("partPrice").isNumeric().optional(),
+    body("partPrice").notEmpty().withMessage("Part price is required"),
 
     check("report")
         .isMongoId()
@@ -72,7 +68,7 @@ exports.createVendorOfferValidator = [
 exports.updateOfferValidator = [
     body("price").optional().isNumeric().withMessage("Price must be a number"),
     body("deadline").optional().isISO8601().toDate().withMessage("Deadline must be a valid date"),
-    body("partPrice").optional().isNumeric().withMessage("Part price must be a number"),
+    body("partPrice").optional(),
 
     check("id")
         .isMongoId()
