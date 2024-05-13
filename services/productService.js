@@ -66,20 +66,44 @@ exports.updateProducts = asyncHandler(async (req, res, next) => {
         return next(new ApiError(`No products found`, 400))
     }
 
-    products.forEach(async (product) => {
-        const update = await Product.findById(product)
-        console.log(update)
-        // if (update.createdBy === req.user.id) {
-        //     if (Discount) {
-        //         update.Discount = Discount
-        //         update.priceAfterDiscount = product.price - (product.price * Discount) / 100
-        //     } else if (fixed) {
-        //         update.Discount = fixed
-        //         update.priceAfterDiscount = product.price - fixed
-        //     }
-        //     await update.save()
-        // }
-    })
+    let errorSent = false // Flag to track if an error has been sent
+
+    for (const productId of products) {
+        const update = await Product.findById(productId)
+
+        if (!update) {
+            return next(new ApiError(`Product with ID ${productId} not found`, 404))
+        }
+
+        if (update.createdBy._id.toString() !== req.user.id) {
+            continue // Skip this iteration if product is not created by current user
+        }
+
+        if (Discount && (Discount <= 0 || Discount >= 100)) {
+            if (!errorSent) {
+                // Check if error has been sent
+                errorSent = true
+                return next(new ApiError(`Percentage discount should be greater than 0 and less than 100`, 400))
+            }
+        } else if (fixed && (fixed <= 0 || fixed >= update.price)) {
+            if (!errorSent) {
+                // Check if error has been sent
+                errorSent = true
+                return next(new ApiError(`Fixed discount should be greater than 0 and less than the product's price`, 400))
+            }
+        }
+
+        if (Discount) {
+            update.Discount = Discount
+            update.priceAfterDiscount = update.price - (update.price * Discount) / 100
+        } else if (fixed) {
+            update.fixed = fixed
+            update.priceAfterDiscount = update.price - fixed
+        }
+
+        await update.save()
+    }
+
     res.status(200).json({
         status: "success",
         message: "Products updated successfully",

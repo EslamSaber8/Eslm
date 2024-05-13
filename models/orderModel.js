@@ -16,6 +16,11 @@ const orderSchema = new mongoose.Schema(
         quantity: Number,
         color: String,
         price: Number,
+        status: {
+          type: String,
+          enum: ["Pending","shipped" ,"delivered"],
+          default: 'Pending',
+        },
       },
     ],
     taxPrice: {

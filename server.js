@@ -26,15 +26,16 @@ const topFiveRoute = require("./routes/topFiveRoute")
 
 // Connect with db
 dbConnection()
-
+const bodyParser = require("body-parser")
 // express app
 const app = express()
 // Enable other domains to access your application
 app.use(cors())
 app.options("*", cors())
-
+app.use(bodyParser.urlencoded({ extended: true }))
 // Middlewares
 app.use(express.json())
+
 // app.use(express.static(path.join(__dirname, "uploads")))
 app.use("/uploads", express.static("uploads"))
 

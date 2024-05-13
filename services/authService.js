@@ -22,7 +22,6 @@ exports.signupAs = asyncHandler(async (req, res, next) => {
     }
     const verifyCode = Math.floor(1000 + Math.random() * 9000).toString()
     const verifyCodeExpires = Date.now() + 10 * 60 * 1000
-
     const user = await User.create({
         name: req.body.name,
         email: req.body.email,
@@ -31,12 +30,14 @@ exports.signupAs = asyncHandler(async (req, res, next) => {
         idImg: req.body.idImg,
         workshopLocationLat: req.body.workshopLocationLat,
         workshopLocationLong: req.body.workshopLocationLong,
+        location: { type: "Point", coordinates: [req.body.workshopLocationLong, req.body.workshopLocationLat] },
         verifyCode,
         verifyCodeExpires,
         password: req.body.password,
         phone: req.body.phone,
         license: req.body.license,
         idImg: req.body.idImg,
+        government: req.body.government,
     })
 
     // 2- Generate token

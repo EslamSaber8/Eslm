@@ -42,6 +42,7 @@ exports.signupValidator = [
     check("passwordConfirm").notEmpty().withMessage("passReqConf"),
 
     check("license").notEmpty().withMessage("licenseReq"),
+    check("government").notEmpty().withMessage("governmentReq"),
 
     check("idImg").notEmpty().withMessage("ID image required"),
 

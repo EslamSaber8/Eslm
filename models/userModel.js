@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
             trim: true,
             required: [true, "name required"],
         },
+
         slug: {
             type: String,
             lowercase: true,
@@ -56,6 +57,10 @@ const userSchema = new mongoose.Schema(
         passwordResetVerified: Boolean,
         workshopLocationLat: String,
         workshopLocationLong: String,
+        location: {
+            type: { type: String, default: "Point" },
+            coordinates: [Number], // [longitude, latitude]
+        },
         role: {
             type: String,
             enum: ["workshop", "driver", "insurance", "vendor", "admin", "superAdmin"],
@@ -66,6 +71,10 @@ const userSchema = new mongoose.Schema(
             default: true,
         },
         locations: String,
+        government: {
+            type: String,
+            required: [true, "government required"],
+        },
     },
     { timestamps: true }
 )
