@@ -114,3 +114,15 @@ exports.lists = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({ status: "success", data: result })
 })
+
+exports.updateVendor = asyncHandler(async (req, res, next) => {
+    const orders = await Order.findById(req.params.id)
+    orders.cartItems.forEach(async (cartItem) => {
+        if (cartItem.product && cartItem.product.createdBy && cartItem.product.createdBy._id.toString() === req.user._id.toString()) {
+            // update order status
+            return (cartItem.status = req.body.status)
+        }
+    })
+    await orders.save()
+    res.status(200).json({ status: "success", data: "status change success" })
+})
