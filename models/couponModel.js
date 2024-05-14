@@ -16,13 +16,6 @@ const couponSchema = new mongoose.Schema(
             type: Number,
             required: [true, "Coupon discount value required"],
         },
-    expire: {      type: Date,
-      required: [true, 'Coupon expire time required'],
-    },
-    discount: {
-      type: Number,
-      required: [true, 'Coupon discount value required'],
-    },
   },
   { timestamps: true }
 );
