@@ -9,6 +9,7 @@ exports.getReportValidator = [
 exports.createReportValidator = [
     // Validate images field
     body('images').notEmpty().withMessage('Images must be an array '),
+    body('carImages').notEmpty().withMessage('carImages must be an array '),
     // Validate carMake field
     body('carMake').isString().notEmpty().withMessage('Car make is required'),
     // Validate carModel field`

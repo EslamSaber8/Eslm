@@ -8,10 +8,14 @@ const reportSchema = new mongoose.Schema(
         carMake: String,
         carModel: String,
         carNumber: String,
+        carImages:[String],
         manufactureYear: Date,
         reportDescription: String,
         partsList: [String], // Optional, array of parts
-        isPartAvailable: Boolean, //true if user have parts
+        isPartAvailable:{
+            type:Boolean,
+            default:false
+        } , //true if user have parts
         selectedVendor: {
             type: mongoose.Schema.ObjectId,
             ref: "User",

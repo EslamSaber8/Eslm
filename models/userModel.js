@@ -76,7 +76,7 @@ const userSchema = new mongoose.Schema(
         government: {
 
             type: String,
-            required: [true, "government required"],
+            // required: [true, "government required"],
         },
     },
     { timestamps: true }

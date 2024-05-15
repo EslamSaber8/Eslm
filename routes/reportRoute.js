@@ -35,11 +35,11 @@ router
 router
     .route("/workshop/:id")
     .post(authService.allowedTo("admin", "superAdmin", "insurance"), acceptWorkshopOffer)
-    .put(authService.allowedTo("admin", "superAdmin", "insurance", "workshop"), workshopFinishFixing)
+    .put(authService.allowedTo("admin", "superAdmin", "insurance", "workshop"), uploadMultipleImages,workshopFinishFixing)
 router
     .route("/driver/:id")
     .post(authService.allowedTo("admin", "superAdmin", "insurance"), acceptDriverOffer)
-    .put(authService.allowedTo("admin", "superAdmin", "insurance", "driver"), driverFinishDelivery)
+    .put(authService.allowedTo("admin", "superAdmin", "insurance", "driver"), uploadMultipleImages, driverFinishDelivery)
 
 router
     .route("/vendor/:id")
