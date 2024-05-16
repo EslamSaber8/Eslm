@@ -39,12 +39,12 @@ router
 router
     .route("/driver/:id")
     .post(authService.allowedTo("admin", "superAdmin", "insurance"), acceptDriverOffer)
-    .put(authService.allowedTo("admin", "superAdmin", "insurance", "driver"), uploadMultipleImages, driverFinishDelivery)
+    .put(authService.allowedTo("admin", "superAdmin", "insurance", "driver"), uploadMultipleImages,driverFinishDelivery)
 
 router
     .route("/vendor/:id")
     .post(authService.allowedTo("admin", "superAdmin", "insurance"), acceptVendorOffer)
-    .put(authService.allowedTo("admin", "superAdmin", "insurance", "vendor"), vendorFinishDelivery)
+    .put(authService.allowedTo("admin", "superAdmin", "insurance", "vendor"),uploadMultipleImages,vendorFinishDelivery)
 
 router.route("/complete/:id").post(authService.allowedTo("admin", "superAdmin", "insurance"), completeReport)
 

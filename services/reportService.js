@@ -145,6 +145,8 @@ exports.updateReport = asyncHandler(async (req, res, next) => {
         {
             images: req.body.images,
             carImages:req.body.carImages,
+            deliverImages:req.body.deliverImages,
+            fixingImages:req.body.fixingImages,
             carMake: req.body.carMake,
             carModel: req.body.carModel,
             carNumber: req.body.carNumber,
@@ -318,8 +320,6 @@ exports.driverFinishDelivery = asyncHandler(async (req, res, next) => {
     if (!report) {
         return next(new ApiError(`No document for this id ${req.params.id}`, 404))
     }
-    report.carImages=[];
-    console.log(req.body.carImages);
     if (report.progress === "driverinprogress") {
         report.progress = "workshopinprogress";
         report.carImages=req.body.carImages;
@@ -340,10 +340,9 @@ exports.workshopFinishFixing = asyncHandler(async (req, res, next) => {
     if (!report) {
         return next(new ApiError(`No document for this id ${req.params.id}`, 404))
     }
-    report.carImages=[];
     if (report.progress === "workshopinprogress") {
         report.progress ="workshopcompleted";
-        report.carImages=req.body.carImages;
+        report.fixingImages=req.body.fixingImages;
         // report.reportStatus = "completed"
         await report.save()
         let selectInsuranceCompany = await User.findById(report.createdBy)
@@ -367,7 +366,9 @@ exports.vendorFinishDelivery = asyncHandler(async (req, res, next) => {
         return next(new ApiError(`No document for this id ${req.params.id}`, 404))
     }
     if (report.selectedVendor) {
+        console.log(report.selectedVendor)
         report.vendorStatus = "delivered"
+        report.deliverImages=req.body.deliverImages;
         await report.save()
         let selectInsuranceCompany = await User.findById(report.createdBy)
         selectInsuranceCompany.notifications.push({

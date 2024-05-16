@@ -27,6 +27,8 @@ const fieldsUpload = upload.fields([
     { name: "avatar", maxCount: 1 },
     { name: "images", maxCount: 5 },
     { name: "carImages", maxCount: 5 },
+    { name: "fixingImages", maxCount: 5 },
+    { name: "deliverImages", maxCount: 5 },
     { name: "imageCover", maxCount: 1 },
     { name: "imageid", maxCount: 10 },
     { name: "uploadFiles", maxCount: 5 },
@@ -56,6 +58,12 @@ exports.uploadMultipleImages = asyncHandler(async (req, res, next) => {
             }
             if (req.files.carImages) {
                 req.body.carImages = req.files.carImages.map((file) => domainName + file.filename)
+            }
+            if (req.files.fixingImages) {
+                req.body.fixingImages = req.files.fixingImages.map((file) => domainName + file.filename)
+            }
+            if (req.files.deliverImages) {
+                req.body.deliverImages = req.files.deliverImages.map((file) => domainName + file.filename)
             }
             if (req.files.imageCover) {
                 req.body.imageCover = domainName + req.files.imageCover[0].filename

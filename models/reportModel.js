@@ -9,6 +9,8 @@ const reportSchema = new mongoose.Schema(
         carModel: String,
         carNumber: String,
         carImages:[String],
+        fixingImages:[String],
+        deliverImages:[String],
         manufactureYear: Date,
         reportDescription: String,
         partsList: [String], // Optional, array of parts
